@@ -1,1 +1,0 @@
-deno run --allow-all ./grab-qty.js

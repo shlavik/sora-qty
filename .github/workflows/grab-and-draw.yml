@@ -7,7 +7,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: denoland/setup-deno@v1
-      - run: ./run.sh
+      - run: ./grab.sh
+      - run: ./draw.sh
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Qty grabbed

@@ -1,17 +1,26 @@
+import tokens from "./tokens.json" assert { type: "json" };
+
 const baseUrl = "https://mof.sora.org/qty/";
-const tokens = ["xor", "val", "pswap", "xst", "xstusd"];
 
 grab().then((grabbed) => {
   const now = Date.now();
-  const decoder = new TextDecoder();
   const encoder = new TextEncoder();
+  const decoder = new TextDecoder();
+  const append = (value) => (parsed) => (
+    parsed.length > 1 &&
+    value[1] === parsed.at(-2)[1] &&
+    value[1] === parsed.at(-1)[1]
+      ? parsed.splice(-1, 1, value)
+      : parsed.push(value),
+    parsed
+  );
   grabbed.forEach(([token, qty]) => {
     const path = "./data/" + token + ".json";
     Deno.readFile(path)
       .then((file) => decoder.decode(file))
       .then(JSON.parse)
       .catch(() => [])
-      .then((parsed) => (parsed.push([now, qty]), parsed))
+      .then(append([now, qty]))
       .then(JSON.stringify)
       .then((json) => encoder.encode(json))
       .then((encoded) => Deno.writeFile(path, encoded));
