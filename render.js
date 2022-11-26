@@ -23,9 +23,20 @@ const path = "./fonts/Sora-SemiBold.ttf";
 const file = Deno.readFileSync(path);
 Fonts.register(file, "sora");
 
-tokens.forEach(makeCart);
+(function renderReadme() {
+  const header = "# [Sora qty weekly analyzer](https://sora-qty.info)\n";
+  const pics = tokens
+    .map((token) => {
+      const url = "https://mof.sora.org/qty/" + token;
+      return `[![${url}](./images/${token}.png "${url}")](${url})`;
+    })
+    .join("\n");
+  Deno.writeTextFileSync("./README.md", header + pics);
+})();
 
-function makeCart(token) {
+tokens.forEach(renderCart);
+
+function renderCart(token) {
   const width = 360;
   const height = 630;
   const canvas = createCanvas(width, height);
@@ -114,7 +125,8 @@ function drawPolyline(ctx, points, { filled = false } = {}) {
     const allY = points.map(([_, y]) => y);
     const y1 = Math.min(...allY);
     const y2 = Math.max(...allY) + ctx.lineWidth;
-    const gradient = ctx.createLinearGradient(x1, y1, x2, y2);
+    const x = (x1 + x2) / 2;
+    const gradient = ctx.createLinearGradient(x, y1, x, y2);
     gradient.addColorStop(0, "rgba(255, 255, 0, 0.4)");
     gradient.addColorStop(1, "rgba(255, 255, 0, 0)");
     ctx.fillStyle = gradient;
