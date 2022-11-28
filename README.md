@@ -1,4 +1,7 @@
 # [Sora qty weekly analyzer](https://sora-qty.info)
+
+> Sat Dec 03 2022 20:29:00 GMT+0000 (Coordinated Universal Time)
+
 [![https://mof.sora.org/qty/xor](./images/xor.png "https://mof.sora.org/qty/xor")](https://mof.sora.org/qty/xor)
 [![https://mof.sora.org/qty/xstusd](./images/xstusd.png "https://mof.sora.org/qty/xstusd")](https://mof.sora.org/qty/xstusd)
 [![https://mof.sora.org/qty/val](./images/val.png "https://mof.sora.org/qty/val")](https://mof.sora.org/qty/val)

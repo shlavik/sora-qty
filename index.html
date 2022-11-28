@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
+    />
+    <meta
+      name="description"
+      content="Learn how qty of Sora ecosystem tokens changes during week"
+    />
+    <meta
+      name="keywords"
+      content="Sora, cryptocurrency, crypto, tokens, qty, xor, val, pswap, xst, xstusd"
+    />
+    <meta
+      property="og:image"
+      content="https://sora-qty.info/images/preview.png"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <title>Sora qty weekly analyzer</title>
+    <link rel="icon" type="image/png" href="./images/icons/xor.png" />
+    <link
+      rel="preload"
+      href="./fonts/Sora-SemiBold.ttf"
+      as="font"
+      type="font/ttf"
+    />
+    <link
+      rel="preload"
+      href="./images/placeholder.png"
+      as="image"
+      type="image/png"
+    />
+    <style>
+      @font-face {
+        font-family: sora;
+        font-style: normal;
+        font-weight: normal;
+        src: url("./fonts/Sora-SemiBold.ttf");
+      }
+      body {
+        display: flex;
+        height: 100rem;
+        align-items: flex-end;
+        margin: 0;
+        background-color: #492067;
+        color: white;
+        font-family: sora;
+        overflow-y: hidden;
+      }
+      header {
+        position: fixed;
+        top: 0;
+        right: 0;
+        left: 0;
+        display: flex;
+        height: 18rem;
+        align-items: center;
+        justify-content: center;
+      }
+      h1 {
+        margin: 0;
+        font-size: 7vmin;
+      }
+      content {
+        --padding: clamp(4vmin, calc(50vmin - 180px), 4vmax);
+        display: flex;
+      }
+      canvas {
+        height: calc(100rem - 18rem - var(--padding));
+        max-height: 630px;
+        margin: 18rem 2vmin var(--padding);
+        aspect-ratio: 36 / 63;
+        background-image: url(./images/placeholder.png);
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: contain;
+      }
+      canvas:first-child {
+        margin-left: var(--padding);
+      }
+      canvas:last-child {
+        margin-right: var(--padding);
+      }
+      shadow {
+        position: fixed;
+        display: block;
+        width: 8vmin;
+        height: 100rem;
+        background-color: transparent;
+        touch-action: none;
+      }
+      shadow[left] {
+        left: 0;
+        background-image: linear-gradient(90deg, #492067, transparent);
+      }
+      shadow[right] {
+        right: 0;
+        background-image: linear-gradient(270deg, #492067, transparent);
+      }
+      ::-webkit-scrollbar {
+        height: 4rem;
+        background-color: #492067;
+      }
+      ::-webkit-scrollbar-thumb {
+        border: #492067 solid 1rem;
+        background-color: white;
+        border-radius: 2rem;
+      }
+    </style>
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-FL6DQC8FHB"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-FL6DQC8FHB");
+    </script>
+  </head>
+  <body>
+    <header>
+      <h1>Sora qty weekly analyzer</h1>
+    </header>
+    <content></content>
+    <shadow left></shadow>
+    <shadow right></shadow>
+    <noscript>You need to enable JavaScript to use this site</noscript>
+    <script>
+      const updateRem = () => {
+        document.documentElement.style.setProperty(
+          "font-size",
+          `${window.innerHeight * 0.01}px`
+        );
+      };
+      updateRem();
+      window.addEventListener("resize", updateRem);
+      window.addEventListener("wheel", (evt) => {
+        document.documentElement.scrollLeft += evt.deltaX + evt.deltaY;
+      });
+      const contentEl = document.querySelector("content");
+      Promise.all([
+        import("./utils.js"),
+        fetch("./tokens.json")
+          .then((response) => response.text())
+          .then(JSON.parse)
+          .catch(() => []),
+      ])
+        .catch(() => {
+          setTimeout(() => {
+            window.location = window.location;
+          }, 1337);
+        })
+        .then(([{ registerDrawImage, drawCart }, tokens]) => {
+          registerDrawImage((ctx, [x, y], img) => {
+            ctx.drawImage(img, x, y);
+          });
+          tokens.forEach((token) => {
+            const canvas = document.createElement("canvas");
+            canvas.width = 360;
+            canvas.height = 630;
+            canvas.title = token.toUpperCase();
+            contentEl.appendChild(canvas);
+            const image = document.createElement("img");
+            image.src = "./images/icons/" + token + ".png";
+            image.addEventListener("load", () => {
+              fetch("./data/weekly/" + token + ".json")
+                .then((response) => response.text())
+                .then(JSON.parse)
+                .catch(() => [])
+                .then((data) => {
+                  const context = canvas.getContext("2d");
+                  drawCart(
+                    context,
+                    [
+                      [0, 0],
+                      [canvas.width, canvas.height],
+                    ],
+                    { token, data, icon: image }
+                  );
+                });
+            });
+          });
+        });
+    </script>
+  </body>
+</html>
