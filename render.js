@@ -2,7 +2,7 @@ import {
   createCanvas,
   Fonts,
   Image,
-} from "https://deno.land/x/skia_canvas@0.4.0/mod.ts";
+} from "https://deno.land/x/skia_canvas/mod.ts";
 
 import { registerDrawImage, drawCart, drawPreview } from "./utils.js";
 
@@ -19,14 +19,30 @@ const tokenData = Object.fromEntries(
   )
 );
 
+const fontPath = "./fonts/Sora-SemiBold.ttf";
+const fontFile = Deno.readFileSync(fontPath);
+Fonts.register(fontFile, "sora");
+
 registerDrawImage((ctx, [x, y], path) => {
   const img = new Image(path);
   ctx.drawImage(img, x, y);
 });
 
-const fontPath = "./fonts/Sora-SemiBold.ttf";
-const fontFile = Deno.readFileSync(fontPath);
-Fonts.register(fontFile, "sora");
+(function renderReadme() {
+  const header = "# [Sora qty weekly analyzer](https://sora-qty.info)\n\n";
+  const date = "> " + new Date() + "\n\n";
+  const pics = tokens
+    .map((token) => {
+      const url = "https://mof.sora.org/qty/" + token;
+      return `[![${url}](./images/${token}.png "${url}")](${url})`;
+    })
+    .join("\n");
+  Deno.writeTextFile("./README.md", header + date + pics);
+})();
+
+(function renderTimeStamp() {
+  Deno.writeTextFile("./timestamp.json", Date.now());
+})();
 
 tokens.forEach(renderCart);
 
@@ -64,16 +80,4 @@ function renderCart(token) {
     }
   );
   canvas.save("./images/preview.png");
-})();
-
-(function renderReadme() {
-  const header = "# [Sora qty weekly analyzer](https://sora-qty.info)\n\n";
-  const date = "> " + new Date() + "\n\n";
-  const pics = tokens
-    .map((token) => {
-      const url = "https://mof.sora.org/qty/" + token;
-      return `[![${url}](./images/${token}.png "${url}")](${url})`;
-    })
-    .join("\n");
-  Deno.writeTextFile("./README.md", header + date + pics);
 })();
