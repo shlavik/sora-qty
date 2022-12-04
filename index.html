@@ -80,6 +80,7 @@
       h1 {
         margin: 0;
         font-size: 7vmin;
+        line-height: 1.5;
       }
       h1 a {
         color: white;
@@ -93,9 +94,9 @@
         cursor: help;
       }
       h3 {
+        margin: 0;
         color: rgba(0, 0, 0, 0.5);
         font-size: min(3vmax, 5rem);
-        margin: 1rem 0 0;
       }
       h3:hover {
         color: black;
@@ -131,7 +132,7 @@
         width: 8vmin;
         height: 100rem;
         background-color: transparent;
-        touch-action: none;
+        pointer-events: none;
       }
       shadow[left] {
         left: 0;
@@ -145,7 +146,7 @@
         position: fixed;
         top: 0;
         right: 0;
-        width: 10vh;
+        width: 11vh;
         color: #2c133e;
         fill: white;
         text-indent: 0;
@@ -192,12 +193,12 @@
   <body>
     <header>
       <h1>
-        <a href="https://sora.org" title="visit true Sora site">Sora</a>
+        <a href="https://sora.org" title="visit Sora site">Sora</a>
         <span title="number of coins in circulation">qty</span>
-        <span title="last 7 days actually">weekly</span>
+        <span title="last 7 days mostly">weekly</span>
         <span title="just charts nvm">analyzer</span>
       </h1>
-      <h3>loading...</h3>
+      <h3 title="non-real time unfortunately">loading...</h3>
     </header>
     <content></content>
     <shadow left></shadow>
@@ -226,7 +227,7 @@
       const updateRem = () => {
         document.documentElement.style.setProperty(
           "font-size",
-          `${window.innerHeight * 0.01}px`
+          window.innerHeight * 0.01 + "px"
         );
       };
       updateRem();
@@ -239,62 +240,90 @@
         import("./utils.js"),
         fetch("./tokens.json", { cache: "reload" })
           .then((response) => response.text())
-          .then(JSON.parse)
-          .catch(() => []),
+          .then(JSON.parse),
       ])
         .catch(() => {
           setTimeout(() => {
             window.location = window.location;
-          }, 1337);
+          }, 1000);
         })
         .then(([{ registerDrawImage, drawCart }, tokens]) => {
           registerDrawImage((ctx, [x, y], img) => {
             ctx.drawImage(img, x, y);
           });
-          tokens.forEach((token, index) => {
+          const canvases = {};
+          const icons = {};
+          setInterval(
+            () => checkTimestamp({ tokens, canvases, icons, drawCart }),
+            10000
+          );
+          checkTimestamp({ tokens, canvases, icons, drawCart });
+          tokens.forEach((token) => {
             const canvas = document.createElement("canvas");
+            canvases[token] = canvas;
             canvas.width = 360;
             canvas.height = 630;
-            canvas.title = token.toUpperCase();
             const link = document.createElement("a");
             link.href = "https://mof.sora.org/qty/" + token;
             link.appendChild(canvas);
             contentEl.appendChild(link);
-            setTimeout(() => {
-              const image = document.createElement("img");
-              image.src = "./images/icons/" + token + ".png";
-              image.addEventListener("load", () => {
-                fetch("./data/weekly/" + token + ".json", { cache: "reload" })
-                  .then((response) => response.text())
-                  .then(JSON.parse)
-                  .catch(() => [])
-                  .then((data) => {
-                    const context = canvas.getContext("2d");
-                    drawCart(
-                      context,
-                      [
-                        [0, 0],
-                        [canvas.width, canvas.height],
-                      ],
-                      { token, data, icon: image }
-                    );
-                  });
-              });
-            }, index * 80);
+            const icon = document.createElement("img");
+            icons[token] = icon;
+            icon.src = "./images/icons/" + token + ".png";
+            icon.addEventListener("load", () => {
+              updateCard({ token, canvas, icon, drawCart });
+            });
           });
         });
-      fetch("./timestamp.json", { cache: "reload" })
-        .then((response) => response.text())
-        .then(JSON.parse)
-        .catch(() => {})
-        .then((value) => {
-          value = value
-            ? Math.round((Date.now() - value) / 60000) + "m ago"
-            : "N/A";
-          const h3 = document.querySelector("h3");
-          h3.title = "it's not real time unfortunately";
-          h3.innerText = "last update: " + value;
-        });
+      function updateCard({ token, canvas, icon, drawCart }) {
+        if (!token || !canvas || !icon || !drawCart) return;
+        fetch("./data/weekly/" + token + ".json", { cache: "reload" })
+          .then((response) => response.text())
+          .then(JSON.parse)
+          .catch(() => [])
+          .then((data) => {
+            const context = canvas.getContext("2d");
+            const { qty, min, max } = drawCart(
+              context,
+              [
+                [0, 0],
+                [canvas.width, canvas.height],
+              ],
+              { token, data, icon }
+            );
+            canvas.title =
+              token.toUpperCase() +
+              "\nqty: " +
+              qty +
+              "\nmax: " +
+              max +
+              "\nmin: " +
+              min;
+          });
+      }
+      function checkTimestamp({ tokens, canvases, icons, drawCart }) {
+        fetch("./timestamp.json", { cache: "reload" })
+          .then((response) => response.text())
+          .then(JSON.parse)
+          .catch(() => {})
+          .then((timestamp) => {
+            const h3 = document.querySelector("h3");
+            h3.innerText =
+              "last update: " +
+              (timestamp
+                ? Math.round((Date.now() - timestamp) / 60000) + "m ago"
+                : "N/A");
+            if (!timestamp || timestamp === checkTimestamp.timestamp) return;
+            if (checkTimestamp.timestamp && tokens) {
+              tokens.forEach((token) => {
+                const canvas = canvases[token];
+                const icon = icons[token];
+                updateCard({ token, canvas, icon, drawCart });
+              });
+            }
+            checkTimestamp.timestamp = timestamp;
+          });
+      }
     </script>
   </body>
 </html>

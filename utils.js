@@ -234,6 +234,11 @@ export function drawDetails(ctx, [[x1, y1], [x2, y2]], data = []) {
     [x1, y1],
     [x2, y2],
   ]);
+  return {
+    qty: addSeparator(weekly.at(-1)?.[1] || 0),
+    min: addSeparator(min),
+    max: addSeparator(max),
+  };
 }
 
 export function drawCart(ctx, [[x1, y1], [x2, y2]], { token, data, icon }) {
@@ -263,7 +268,7 @@ export function drawCart(ctx, [[x1, y1], [x2, y2]], { token, data, icon }) {
     color: "yellow",
     size: 36,
   });
-  drawDetails(
+  return drawDetails(
     ctx,
     [
       [padding, 180],
@@ -292,6 +297,7 @@ export function drawPreview(ctx, [[x1, y1], [x2, y2]], { tokens = [] } = {}) {
 export function addSeparator(text) {
   return new Intl.NumberFormat("en-US").format(text);
 }
+
 export function addDays(dirtyDate, amount) {
   const date = new Date(dirtyDate);
   if (!amount) return date;
