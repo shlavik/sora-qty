@@ -206,7 +206,7 @@ export function drawToken(ctx, [x, y], token) {
 export function drawDetails(ctx, [[x1, y1], [x2, y2]], data = []) {
   const padding = 48;
   const now = Date.now();
-  const start = startOfDay(subDays(now, 7)).valueOf();
+  const start = startOfDay(subDays(now, 6)).valueOf();
   const end = endOfDay(now).valueOf();
   const step = (x2 - x1) / (end - start);
   const weekly = cutData(data, start);
