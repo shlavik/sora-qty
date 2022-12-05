@@ -43,7 +43,7 @@ export function drawPolyline(ctx, points, { filled = false } = {}) {
     const y2 = Math.max(...allY) + ctx.lineWidth;
     const gradient = ctx.createLinearGradient(x, y1, x, y2);
     gradient.addColorStop(0, "rgba(255, 255, 0, 0.4)");
-    gradient.addColorStop(1, "rgba(255, 255, 0, 0)");
+    gradient.addColorStop(1, "rgba(255, 0, 0, 0)");
     ctx.fillStyle = gradient;
     points = [[x1, y2], ...points, [x2, y2]];
   }
@@ -189,10 +189,16 @@ export function drawBorder(
 export function drawText(
   ctx,
   [x, y],
-  { text, align = "center", color = "white", size = 20 } = {}
+  { text, align = "center", color = "white", gradient = false, size = 20 } = {}
 ) {
   ctx.save();
-  ctx.fillStyle = color;
+  if (gradient) {
+    const padding = size / 2.5;
+    gradient = ctx.createLinearGradient(x, y - padding, x, y + padding);
+    gradient.addColorStop(0, "yellow");
+    gradient.addColorStop(1, "red");
+  }
+  ctx.fillStyle = gradient ? gradient : color;
   ctx.font = size + "px sora";
   ctx.textAlign = align;
   ctx.textBaseline = "middle";
@@ -277,7 +283,7 @@ export function drawCart(ctx, [[x1, y1], [x2, y2]], { token, data, icon }) {
   drawToken(ctx, [x2 - padding, 72], token);
   drawText(ctx, [(x2 - x1) / 2, 144], {
     text: addSeparator(data.at(-1)?.[1] || 0),
-    color: "yellow",
+    gradient: true,
     size: 36,
   });
   return drawDetails(

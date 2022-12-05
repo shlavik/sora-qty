@@ -64,7 +64,6 @@
         color: white;
         font-family: sora;
         overflow-y: hidden;
-        user-select: green;
       }
       header {
         position: fixed;
@@ -96,31 +95,27 @@
       h3 {
         margin: 0;
         color: rgba(0, 0, 0, 0.5);
-        font-size: min(3vmax, 5rem);
+        font-size: min(5rem, 7vmin);
       }
       h3:hover {
         color: black;
         cursor: help;
       }
       content {
-        --padding: clamp(2vmin, calc(50vw - 180px), 4rem);
         display: flex;
       }
       content a {
-        margin: 20rem 2vmin var(--padding);
+        margin: 20rem 2vmin 6vmin;
       }
       content a:first-child {
-        margin-left: var(--padding);
+        margin-left: 6vmin;
       }
       content a:last-child {
-        margin-right: var(--padding);
+        margin-right: 6vmin;
       }
       canvas {
-        --height: calc(80rem - var(--padding));
-        width: calc(var(--height) * 36 / 63);
-        height: var(--height);
-        max-width: 360px;
-        max-height: 630px;
+        height: min(74rem, 154vmin);
+        aspect-ratio: 36/63;
         background-image: url(./images/placeholder.png);
         background-position: center;
         background-repeat: no-repeat;
@@ -149,7 +144,7 @@
         padding: 2rem;
       }
       .impermanent-loss img {
-        width: 7rem;
+        width: 6rem;
         opacity: 0.5;
       }
       .impermanent-loss:hover img {
@@ -164,12 +159,6 @@
         fill: white;
         text-indent: 0;
       }
-      @media (max-aspect-ratio: 1/1) {
-        .impermanent-loss,
-        .github-corner {
-          display: none;
-        }
-      }
       .github-corner .octo-arm {
         transform-origin: 130px 106px;
       }
@@ -178,6 +167,12 @@
       }
       .github-corner:hover .octo-arm {
         animation: octocat-wave 560ms ease-in-out;
+      }
+      @media (max-aspect-ratio: 1/1) {
+        .impermanent-loss,
+        .github-corner {
+          display: none;
+        }
       }
       @keyframes octocat-wave {
         0%,
