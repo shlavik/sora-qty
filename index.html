@@ -142,22 +142,39 @@
         right: 0;
         background-image: linear-gradient(270deg, #492067, transparent);
       }
+      .impermanent-loss {
+        position: fixed;
+        top: 0;
+        left: 0;
+        padding: 2rem;
+      }
+      .impermanent-loss img {
+        width: 7rem;
+        opacity: 0.5;
+      }
+      .impermanent-loss:hover img {
+        opacity: 1;
+      }
       .github-corner {
         position: fixed;
         top: 0;
         right: 0;
-        width: 11vh;
+        width: 11rem;
         color: #2c133e;
         fill: white;
         text-indent: 0;
       }
       @media (max-aspect-ratio: 1/1) {
+        .impermanent-loss,
         .github-corner {
           display: none;
         }
       }
       .github-corner .octo-arm {
         transform-origin: 130px 106px;
+      }
+      .github-corner:hover {
+        color: black;
       }
       .github-corner:hover .octo-arm {
         animation: octocat-wave 560ms ease-in-out;
@@ -203,6 +220,13 @@
     <content></content>
     <shadow left></shadow>
     <shadow right></shadow>
+    <a
+      href="https://shlavik.github.io/deocalc/#/impermanent-loss"
+      class="impermanent-loss"
+      title="try impermanent loss calculator"
+    >
+      <img src="./images/icons/calc.png" />
+    </a>
     <a
       href="https://github.com/shlavik/sora-qty"
       class="github-corner"
