@@ -33,6 +33,7 @@ export function drawArc(ctx, [x, y], { radius, start, end, color, line } = {}) {
 }
 
 export function drawPolyline(ctx, points, { filled = false } = {}) {
+  ctx.save();
   if (filled) {
     const x1 = points[0][0];
     const x2 = points.at(-1)[0];
@@ -44,10 +45,8 @@ export function drawPolyline(ctx, points, { filled = false } = {}) {
     gradient.addColorStop(0, "rgba(255, 255, 0, 0.4)");
     gradient.addColorStop(1, "rgba(255, 255, 0, 0)");
     ctx.fillStyle = gradient;
-    points.unshift([x1, y2]);
-    points.push([x2, y2]);
+    points = [[x1, y2], ...points, [x2, y2]];
   }
-  ctx.save();
   ctx.beginPath();
   ctx.moveTo(points[0][0], points[0][1]);
   for (let i = 1; i < points.length; i++) {
@@ -57,12 +56,25 @@ export function drawPolyline(ctx, points, { filled = false } = {}) {
   ctx.restore();
 }
 
-export function drawChart(ctx, points, { color = "yellow", line = 2 } = {}) {
+export function drawChart(ctx, points) {
   ctx.save();
-  ctx.strokeStyle = color;
-  ctx.lineWidth = line;
+  ctx.lineJoin = "round";
+  ctx.strokeStyle = "yellow";
+  ctx.lineWidth = 2;
   drawPolyline(ctx, points);
   drawPolyline(ctx, points, { filled: true });
+  const [x, y] = points.at(-1);
+  const arrow = [
+    [x - 24, y + 2],
+    [x, y],
+    [x - 24, y - 2],
+  ];
+  ctx.strokeStyle = "#492067";
+  ctx.lineWidth = 6;
+  drawPolyline(ctx, arrow);
+  ctx.strokeStyle = "red";
+  ctx.lineWidth = 3;
+  drawPolyline(ctx, arrow);
   ctx.restore();
 }
 
