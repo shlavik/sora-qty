@@ -1,6 +1,6 @@
-# [Sora qty weekly analyzer](https://sora-qty.info)
+# [Sora quantity monitor](https://sora-qty.info)
 
-> Tue Dec 06 2022 13:57:57 GMT+0000 (Greenwich Mean Time)
+> Thu Dec 08 2022 20:21:56 GMT+0000 (Coordinated Universal Time)
 
 [![https://mof.sora.org/qty/xor](./images/xor.png "https://mof.sora.org/qty/xor")](https://mof.sora.org/qty/xor)
 [![https://mof.sora.org/qty/xstusd](./images/xstusd.png "https://mof.sora.org/qty/xstusd")](https://mof.sora.org/qty/xstusd)

@@ -4,14 +4,14 @@ import {
   Image,
 } from "https://deno.land/x/skia_canvas/mod.ts";
 
-import { registerDrawImage, drawCart, drawPreview } from "./utils.js";
+import { registerDrawImage, drawCard, drawPreview } from "./utils.js";
 
 import tokens from "./tokens.json" assert { type: "json" };
 
-const tokenData = Object.fromEntries(
+const dataset = Object.fromEntries(
   await Promise.all(
     tokens.map((token) =>
-      import("./data/weekly/" + token + ".json", { assert: { type: "json" } })
+      import("./data/monthly/" + token + ".json", { assert: { type: "json" } })
         .then((result) => result.default)
         .catch(() => [])
         .then((value) => [token, value])
@@ -29,7 +29,7 @@ registerDrawImage((ctx, [x, y], path) => {
 });
 
 (function renderReadme() {
-  const header = "# [Sora qty weekly analyzer](https://sora-qty.info)\n\n";
+  const header = "# [Sora quantity monitor](https://sora-qty.info)\n\n";
   const date = "> " + new Date() + "\n\n";
   const pics = tokens
     .map((token) => {
@@ -44,12 +44,12 @@ registerDrawImage((ctx, [x, y], path) => {
   Deno.writeTextFile("./timestamp.json", Date.now());
 })();
 
-tokens.forEach(renderCart);
+tokens.forEach(renderCard);
 
-function renderCart(token) {
+function renderCard(token) {
   const canvas = createCanvas(360, 630);
   const context = canvas.getContext("2d");
-  drawCart(
+  drawCard(
     context,
     [
       [0, 0],
@@ -57,7 +57,7 @@ function renderCart(token) {
     ],
     {
       token,
-      data: tokenData[token],
+      data: dataset[token],
       icon: "./images/icons/" + token + ".png",
     }
   );

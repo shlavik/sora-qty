@@ -1,4 +1,6 @@
-let drawImage = () => {};
+let drawImage = (ctx, [x, y], img) => {
+  ctx.drawImage(img, x, y);
+};
 
 export function registerDrawImage(di) {
   drawImage = di;
@@ -56,18 +58,30 @@ export function drawPolyline(ctx, points, { filled = false } = {}) {
   ctx.restore();
 }
 
-export function drawChart(ctx, points) {
+export function drawChart(ctx, points = []) {
+  if (!points || points.length < 1) return;
   ctx.save();
   ctx.lineJoin = "round";
+  drawPolyline(ctx, points, { filled: true });
+  ctx.strokeStyle = "#492067";
+  ctx.lineWidth = 5;
+  drawPolyline(ctx, points);
   ctx.strokeStyle = "yellow";
   ctx.lineWidth = 2;
   drawPolyline(ctx, points);
-  drawPolyline(ctx, points, { filled: true });
-  const [x, y] = points.at(-1);
+  ctx.restore();
+}
+
+export function drawArrow(ctx, [x, y], { widht = 24, height = 4 } = {}) {
+  ctx.save();
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  x--;
+  x--;
   const arrow = [
-    [x - 24, y + 2],
+    [x - widht, y + height / 2],
     [x, y],
-    [x - 24, y - 2],
+    [x - widht, y - height / 2],
   ];
   ctx.strokeStyle = "#492067";
   ctx.lineWidth = 6;
@@ -78,51 +92,45 @@ export function drawChart(ctx, points) {
   ctx.restore();
 }
 
-export function drawRuler(
-  ctx,
-  [[x1, y1], [x2, y2]],
-  { segment = 7, color = "rgba(0, 0, 0, 0.6)", line = 2 } = {}
-) {
+export function drawRuler(ctx, [[x1, y1], [x2, y2]], { timeframe } = {}) {
+  const color = "rgba(0, 0, 0, 0.6)";
+  const line = 2;
+  const segment = timeframe === "weekly" ? 7 : 11;
   const step = (x2 - x1) / segment;
   let day = new Date();
   for (let i = segment; i > 0; i--) {
-    const x = x1 + i * step;
-    drawLine(
-      ctx,
-      [
-        [x, y1],
-        [x, y2],
-      ],
-      {
-        color,
-        line,
-      }
-    );
-    const month = day.getMonth() + 1;
-    const date = day.getDate();
-    day = subDays(day, 1);
-    const opts = {
-      text:
-        (month < 10 ? "0" + month : month) +
-        "." +
-        (date < 10 ? "0" + date : date),
-      color,
-      size: 14,
-    };
-    drawText(ctx, [x - step / 2, y1 + 6], opts);
-    drawText(ctx, [x - step / 2, y2 - 6], opts);
-    if (i !== 1) continue;
-    drawLine(
-      ctx,
-      [
-        [x1, y1],
-        [x1, y2],
-      ],
-      {
-        color,
-        line,
-      }
-    );
+    const lineX = x1 + i * step;
+    if (i !== segment) {
+      drawLine(
+        ctx,
+        [
+          [lineX, y1],
+          [lineX, y2],
+        ],
+        {
+          color,
+          line,
+        }
+      );
+    }
+    if (timeframe === "monthly") day = subDays(day, 1);
+    let month = day.getMonth() + 1;
+    month = month < 10 ? "0" + month : month;
+    let date = day.getDate();
+    date = date < 10 ? "0" + date : date;
+    day = subDays(day, timeframe === "weekly" ? 1 : 2);
+    const x = lineX - step / 2;
+    const opts = { color, size: 14 };
+    if (timeframe === "weekly") {
+      const text = month + "." + date;
+      drawText(ctx, [x, y1 + 6], { ...opts, text });
+      drawText(ctx, [x, y2 - 6], { ...opts, text });
+    } else {
+      drawText(ctx, [x, y1 + 6], { ...opts, text: month });
+      drawText(ctx, [x, y2 - 6], { ...opts, text: month });
+      drawText(ctx, [x, y1 + 18], { ...opts, text: date });
+      drawText(ctx, [x, y2 - 18], { ...opts, text: date });
+    }
   }
 }
 
@@ -221,37 +229,50 @@ export function drawToken(ctx, [x, y], token) {
   });
 }
 
-export function drawDetails(ctx, [[x1, y1], [x2, y2]], data = []) {
+export function drawDetails(
+  ctx,
+  [[x1, y1], [x2, y2]],
+  { data = [], timeframe } = {}
+) {
   const padding = 48;
+  drawRuler(
+    ctx,
+    [
+      [x1, y1 + padding],
+      [x2, y2 - padding],
+    ],
+    { timeframe }
+  );
   const now = Date.now();
-  const start = startOfDay(subDays(now, 6)).valueOf();
+  const start = startOfDay(
+    subDays(now, timeframe === "weekly" ? 6 : 32)
+  ).valueOf();
   const end = endOfDay(now).valueOf();
   const step = (x2 - x1) / (end - start);
   const weekly = cutData(data, start);
   const min = weekly.length > 0 ? Math.min(...weekly.map(([_, v]) => v)) : 0;
   const max = weekly.length > 0 ? Math.max(...weekly.map(([_, v]) => v)) : 0;
-  const height = y2 - y1 - 3 * padding;
+  const textX = (x1 + x2) / 2;
+  drawText(ctx, [textX, y1 + 24], {
+    text: addSeparator(max),
+  });
+  drawText(ctx, [textX, y2 - 24], {
+    text: addSeparator(min),
+  });
+  const chartPadding = padding + (timeframe === "weekly" ? 0 : 8);
+  const height = y2 - y1 - 3 * chartPadding;
   const points = weekly.map(([t, v]) => [
     x1 + (t - start) * step,
     min === max
       ? (y1 + y2) / 2
-      : y1 + 1.5 * padding + height - (height * (v - min)) / (max - min),
+      : y1 + 1.5 * chartPadding + height - (height * (v - min)) / (max - min),
   ]);
-  drawRuler(ctx, [
-    [x1, y1 + padding],
-    [x2, y2 - padding],
-  ]);
-  drawText(ctx, [(x1 + x2) / 2, y1 + 24], {
-    text: addSeparator(max),
-  });
-  drawText(ctx, [(x1 + x2) / 2, y2 - 24], {
-    text: addSeparator(min),
-  });
   drawChart(ctx, points);
   drawBorder(ctx, [
-    [x1, y1],
-    [x2, y2],
+    [x1 - 2, y1 - 2],
+    [x2 + 2, y2 + 2],
   ]);
+  drawArrow(ctx, points.at(-1));
   return {
     qty: addSeparator(weekly.at(-1)?.[1] || 0),
     min: addSeparator(min),
@@ -259,7 +280,11 @@ export function drawDetails(ctx, [[x1, y1], [x2, y2]], data = []) {
   };
 }
 
-export function drawCart(ctx, [[x1, y1], [x2, y2]], { token, data, icon }) {
+export function drawCard(
+  ctx,
+  [[x1, y1], [x2, y2]],
+  { token, data, icon, timeframe = "weekly" } = {}
+) {
   const padding = 32;
   drawRect(
     ctx,
@@ -275,10 +300,10 @@ export function drawCart(ctx, [[x1, y1], [x2, y2]], { token, data, icon }) {
   drawBorder(
     ctx,
     [
-      [padding, padding],
-      [padding + 80, padding + 80],
+      [padding - 1, padding - 1],
+      [padding + 81, padding + 81],
     ],
-    { radius: 40, line: 3 }
+    { radius: 40 }
   );
   drawToken(ctx, [x2 - padding, 72], token);
   drawText(ctx, [(x2 - x1) / 2, 144], {
@@ -292,7 +317,10 @@ export function drawCart(ctx, [[x1, y1], [x2, y2]], { token, data, icon }) {
       [padding, 180],
       [x2 - padding, y2 - padding],
     ],
-    data
+    {
+      data,
+      timeframe,
+    }
   );
 }
 

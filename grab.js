@@ -16,11 +16,10 @@ grab().then((grabbed) => {
   );
   const write = (token) => (data) => {
     Deno.writeTextFile("./data/" + token + ".json", JSON.stringify(data));
-    const start = subDays(now, 7).valueOf();
-    const weekly = cutData(data, start);
+    const monthly = cutData(data, subDays(now, 33).valueOf());
     Deno.writeTextFile(
-      "./data/weekly/" + token + ".json",
-      JSON.stringify(weekly)
+      "./data/monthly/" + token + ".json",
+      JSON.stringify(monthly)
     );
   };
   grabbed.forEach(([token, qty]) => {

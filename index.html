@@ -8,18 +8,15 @@
     />
     <meta
       name="description"
-      content="Learn how supply of Sora ecosystem tokens changes during week"
+      content="Check circulating supply of Sora ecosystem tokens"
     />
     <meta
       name="keywords"
-      content="Sora, cryptocurrency, crypto, token, coin qty, xor, val, pswap, xst, xstusd"
+      content="Sora, circulating suply, cryptocurrency, crypto, token, coin, quantity, qty, ecosystem, xor, val, pswap, xst, xstusd, dot, ksm, eth, dai"
     />
-    <meta
-      property="og:image"
-      content="https://sora-qty.info/images/preview.png"
-    />
+    <meta property="og:image" content="./images/preview.png" />
     <meta name="twitter:card" content="summary_large_image" />
-    <title>Sora qty weekly analyzer</title>
+    <title>Sora quantity monitor</title>
     <link rel="icon" type="image/png" href="./images/icons/xor.png" />
     <link
       rel="preload"
@@ -41,7 +38,7 @@
         src: url("./fonts/Sora-SemiBold.ttf");
       }
       ::selection {
-        background: rgba(255, 255, 255, 0.4);
+        background: #9279a4;
       }
       ::-webkit-scrollbar {
         height: 4rem;
@@ -52,8 +49,19 @@
         background-color: white;
         border-radius: 2rem;
       }
+      ::-webkit-scrollbar-thumb:active {
+        background-color: #cccccc;
+      }
+      a {
+        color: white;
+        text-decoration-thickness: 0.5vmin;
+        text-underline-offset: 0.7vmin;
+      }
+      a:active {
+        filter: brightness(0.8);
+      }
       html {
-        font-size: 1vmin;
+        font-size: 1vh;
       }
       body {
         display: flex;
@@ -81,25 +89,19 @@
         font-size: 7vmin;
         line-height: 1.5;
       }
-      h1 a {
-        color: white;
+      h1 a:active {
+        color: #e3232c;
+      }
+      h1 a#timeframe {
         text-decoration-style: dotted;
       }
-      h1 a:hover {
-        color: red;
+      h1 a#timeframe:active {
+        color: #52e323;
       }
-      h1 span:hover {
-        color: yellow;
-        cursor: help;
-      }
-      h3 {
+      h2 {
         margin: 0;
-        color: rgba(0, 0, 0, 0.5);
+        color: #241033;
         font-size: min(5rem, 7vmin);
-      }
-      h3:hover {
-        color: black;
-        cursor: help;
       }
       content {
         display: flex;
@@ -114,12 +116,16 @@
         margin-right: 6vmin;
       }
       canvas {
-        height: min(74rem, 154vmin);
+        --width: min(42rem, 88vmin);
+        width: var(--width);
+        height: calc(63 * var(--width) / 36);
         aspect-ratio: 36/63;
         background-image: url(./images/placeholder.png);
         background-position: center;
         background-repeat: no-repeat;
         background-size: contain;
+        border-radius: calc(0.14 * var(--width));
+        border-top-left-radius: calc(0.2 * var(--width));
       }
       shadow {
         position: fixed;
@@ -137,20 +143,32 @@
         right: 0;
         background-image: linear-gradient(270deg, #492067, transparent);
       }
-      .impermanent-loss {
+      noscript {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        padding: 17rem;
+        background: #e3232c;
+        font-size: 5vmin;
+        text-align: center;
+      }
+      #impermanent-loss {
         position: fixed;
         top: 0;
         left: 0;
+        display: grid;
+        align-items: center;
         padding: 2rem;
+        background-color: #492067;
+        color: #241033;
+        font-size: 4rem;
+        grid-template-columns: 3rem 3rem;
+        grid-template-rows: 3rem 3rem;
+        text-decoration: none;
       }
-      .impermanent-loss img {
-        width: 6rem;
-        opacity: 0.5;
-      }
-      .impermanent-loss:hover img {
-        opacity: 1;
-      }
-      .github-corner {
+      #github-corner {
         position: fixed;
         top: 0;
         right: 0;
@@ -159,18 +177,34 @@
         fill: white;
         text-indent: 0;
       }
-      .github-corner .octo-arm {
+      #github-corner #octo-arm {
         transform-origin: 130px 106px;
       }
-      .github-corner:hover {
-        color: black;
-      }
-      .github-corner:hover .octo-arm {
-        animation: octocat-wave 560ms ease-in-out;
+      @media (hover: hover) and (pointer: fine) {
+        :not(a):not(a *)[title] {
+          cursor: help;
+        }
+        h1 a:hover {
+          color: #e3232c;
+        }
+        h1 a#timeframe:hover {
+          color: #52e323;
+        }
+        h1 span:hover {
+          color: #e3d823;
+        }
+        h2:hover,
+        #impermanent-loss:hover,
+        #github-corner:hover {
+          color: black;
+        }
+        #github-corner:hover #octo-arm {
+          animation: octocat-wave 560ms ease-in-out;
+        }
       }
       @media (max-aspect-ratio: 1/1) {
-        .impermanent-loss,
-        .github-corner {
+        #impermanent-loss,
+        #github-corner {
           display: none;
         }
       }
@@ -205,144 +239,45 @@
   <body>
     <header>
       <h1>
-        <a href="https://sora.org" title="visit Sora site">Sora</a>
-        <span title="number of coins in circulation">qty</span>
-        <span title="last 7 days mostly">weekly</span>
-        <span title="just charts nvm">analyzer</span>
+        <a href="https://sora.org" title="[visit Sora site]">Sora</a>
+        <span title="number of coins in circulation">quantity</span>
+        <a id="timeframe" href="#" title="[change timeframe]">weekly</a>
       </h1>
-      <h3 title="non-real time unfortunately">loading...</h3>
+      <h2 title="non-real time unfortunately">loading...</h2>
     </header>
     <content></content>
     <shadow left></shadow>
     <shadow right></shadow>
     <a
+      id="impermanent-loss"
       href="https://shlavik.github.io/deocalc/#/impermanent-loss"
-      class="impermanent-loss"
-      title="try impermanent loss calculator"
+      title="[try impermanent loss calculator]"
     >
-      <img src="./images/icons/calc.png" />
+      <span>+</span>
+      <span>÷</span>
+      <span>×</span>
+      <span>=</span>
     </a>
     <a
+      id="github-corner"
       href="https://github.com/shlavik/sora-qty"
-      class="github-corner"
-      title="fork me on GitHub"
+      title="[fork me on GitHub]"
     >
       <svg viewBox="0 0 250 250" aria-hidden="true">
         <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z" />
         <path
-          class="octo-arm"
+          id="octo-arm"
           d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
           fill="currentColor"
         />
         <path
-          class="octo-body"
+          id="octo-body"
           d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
           fill="currentColor"
         />
       </svg>
     </a>
     <noscript>You need to enable JavaScript to use this site</noscript>
-    <script>
-      const updateRem = () => {
-        document.documentElement.style.setProperty(
-          "font-size",
-          window.innerHeight * 0.01 + "px"
-        );
-      };
-      updateRem();
-      window.addEventListener("resize", updateRem);
-      window.addEventListener("wheel", (evt) => {
-        document.documentElement.scrollLeft += evt.deltaX + evt.deltaY;
-      });
-      const contentEl = document.querySelector("content");
-      Promise.all([
-        import("./utils.js"),
-        fetch("./tokens.json", { cache: "reload" })
-          .then((response) => response.text())
-          .then(JSON.parse),
-      ])
-        .catch(() => {
-          setTimeout(() => {
-            window.location = window.location;
-          }, 1000);
-        })
-        .then(([{ registerDrawImage, drawCart }, tokens]) => {
-          registerDrawImage((ctx, [x, y], img) => {
-            ctx.drawImage(img, x, y);
-          });
-          const canvases = {};
-          const icons = {};
-          setInterval(
-            () => checkTimestamp({ tokens, canvases, icons, drawCart }),
-            10000
-          );
-          checkTimestamp({ tokens, canvases, icons, drawCart });
-          tokens.forEach((token) => {
-            const canvas = document.createElement("canvas");
-            canvases[token] = canvas;
-            canvas.width = 360;
-            canvas.height = 630;
-            const link = document.createElement("a");
-            link.href = "https://mof.sora.org/qty/" + token;
-            link.appendChild(canvas);
-            contentEl.appendChild(link);
-            const icon = document.createElement("img");
-            icons[token] = icon;
-            icon.src = "./images/icons/" + token + ".png";
-            icon.addEventListener("load", () => {
-              updateCard({ token, canvas, icon, drawCart });
-            });
-          });
-        });
-      function updateCard({ token, canvas, icon, drawCart }) {
-        if (!token || !canvas || !icon || !drawCart) return;
-        fetch("./data/weekly/" + token + ".json", { cache: "reload" })
-          .then((response) => response.text())
-          .then(JSON.parse)
-          .catch(() => [])
-          .then((data) => {
-            const context = canvas.getContext("2d");
-            const { qty, min, max } = drawCart(
-              context,
-              [
-                [0, 0],
-                [canvas.width, canvas.height],
-              ],
-              { token, data, icon }
-            );
-            canvas.title =
-              token.toUpperCase() +
-              "\nqty: " +
-              qty +
-              "\nmax: " +
-              max +
-              "\nmin: " +
-              min;
-          });
-      }
-      function checkTimestamp({ tokens, canvases, icons, drawCart }) {
-        fetch("./timestamp.json", { cache: "reload" })
-          .then((response) => response.text())
-          .then(JSON.parse)
-          .catch(() => {})
-          .then((timestamp) => {
-            const h3 = document.querySelector("h3");
-            h3.innerText =
-              "last update: " +
-              (timestamp
-                ? Math.round((Date.now() - timestamp) / 60000) + "m ago"
-                : "N/A");
-            if (!timestamp || timestamp === checkTimestamp.timestamp) return;
-            if (checkTimestamp.timestamp && tokens) {
-              tokens.forEach((token) => {
-                const canvas = canvases[token];
-                const icon = icons[token];
-                updateCard({ token, canvas, icon, drawCart });
-              });
-            }
-            checkTimestamp.timestamp = timestamp;
-          });
-      }
-    </script>
+    <script type="module" src="./client.js"></script>
   </body>
 </html>
