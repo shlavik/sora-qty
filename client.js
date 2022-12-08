@@ -1,10 +1,12 @@
 import { drawCard } from "./utils.js";
 
+const documentEl = document.documentElement;
+const timeframeEl = document.querySelector("a#timeframe");
+const h2El = document.querySelector("h2");
+const contentEl = document.querySelector("content");
+
 const updateRem = () => {
-  document.documentElement.style.setProperty(
-    "font-size",
-    window.innerHeight * 0.01 + "px"
-  );
+  documentEl.style.setProperty("font-size", window.innerHeight * 0.01 + "px");
 };
 
 updateRem();
@@ -12,12 +14,21 @@ updateRem();
 window.addEventListener("resize", updateRem);
 
 window.addEventListener("wheel", ({ deltaX, deltaY }) => {
-  document.documentElement.scrollLeft += deltaX + deltaY;
+  documentEl.scrollLeft += deltaX + deltaY;
 });
 
-const timeframeEl = document.querySelector("a#timeframe");
-const h2El = document.querySelector("h2");
-const contentEl = document.querySelector("content");
+window.addEventListener("keydown", ({ key }) => {
+  switch (key) {
+    case "Home":
+      return (documentEl.scrollLeft = 0);
+    case "PageUp":
+      return (documentEl.scrollLeft -= 0.9 * documentEl.clientWidth);
+    case "PageDown":
+      return (documentEl.scrollLeft += 0.9 * documentEl.clientWidth);
+    case "End":
+      return (documentEl.scrollLeft = documentEl.scrollWidth);
+  }
+});
 
 let timeframe =
   localStorage.getItem("timeframe") === "monthly" ? "monthly" : "weekly";

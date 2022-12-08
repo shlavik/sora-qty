@@ -108,6 +108,9 @@
       }
       content a {
         margin: 20rem 2vmin 6vmin;
+        border-radius: 48em;
+        border-top-left-radius: 72em;
+        font-size: min(0.1166rem, 0.2444vmin);
       }
       content a:first-child {
         margin-left: 6vmin;
@@ -116,16 +119,15 @@
         margin-right: 6vmin;
       }
       canvas {
-        --width: min(42rem, 88vmin);
-        width: var(--width);
-        height: calc(63 * var(--width) / 36);
+        width: 360em;
+        height: 630em;
         aspect-ratio: 36/63;
         background-image: url(./images/placeholder.png);
         background-position: center;
         background-repeat: no-repeat;
         background-size: contain;
-        border-radius: calc(0.14 * var(--width));
-        border-top-left-radius: calc(0.2 * var(--width));
+        border-radius: 48em;
+        border-top-left-radius: 72em;
       }
       shadow {
         position: fixed;
