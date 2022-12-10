@@ -92,9 +92,11 @@ export function drawArrow(ctx, [x, y], { widht = 24, height = 4 } = {}) {
   ctx.restore();
 }
 
-export function drawRuler(ctx, [[x1, y1], [x2, y2]], { timeframe } = {}) {
-  const color = "rgba(0, 0, 0, 0.6)";
-  const line = 2;
+export function drawRuler(
+  ctx,
+  [[x1, y1], [x2, y2]],
+  { timeframe, color = "rgba(0, 0, 0, 0.8)", line = 2 } = {}
+) {
   const segment = timeframe === "weekly" ? 7 : 11;
   const step = (x2 - x1) / segment;
   let day = new Date();
