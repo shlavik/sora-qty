@@ -18,18 +18,6 @@
     <meta name="twitter:card" content="summary_large_image" />
     <title>Sora quantity monitor</title>
     <link rel="icon" type="image/png" href="./images/icons/xor.png" />
-    <link
-      rel="preload"
-      href="./fonts/Sora-SemiBold.ttf"
-      as="font"
-      type="font/ttf"
-    />
-    <link
-      rel="preload"
-      href="./images/placeholder.png"
-      as="image"
-      type="image/png"
-    />
     <style>
       @font-face {
         font-family: sora;
@@ -54,8 +42,8 @@
       }
       a {
         color: white;
-        text-decoration-thickness: 0.5vmin;
-        text-underline-offset: 0.7vmin;
+        text-decoration-thickness: 0.08em;
+        text-underline-offset: 0.1em;
       }
       a:active {
         filter: brightness(0.8);
@@ -94,6 +82,7 @@
       }
       h1 a#timeframe {
         text-decoration-style: dotted;
+        text-decoration-thickness: 0.09em;
       }
       h1 a#timeframe:active {
         color: #52e323;
@@ -106,17 +95,33 @@
       content {
         display: flex;
       }
-      content a {
+      div {
+        position: relative;
+        display: flex;
+        justify-content: center;
         margin: 20rem 2vmin 6vmin;
-        border-radius: 48em;
-        border-top-left-radius: 72em;
-        font-size: min(0.1166rem, 0.2444vmin);
       }
-      content a:first-child {
+      div:first-child {
         margin-left: 6vmin;
       }
-      content a:last-child {
+      div:last-child {
         margin-right: 6vmin;
+      }
+      div a {
+        position: absolute;
+        display: none;
+        bottom: 0;
+        background-color: #492067;
+        color: #0f0615;
+        font-size: 1.7rem;
+        text-decoration: none;
+        user-select: none;
+      }
+      div:hover a {
+        display: inline;
+      }
+      div:hover a:hover {
+        color: black;
       }
       canvas {
         width: 360em;
@@ -128,6 +133,7 @@
         background-size: contain;
         border-radius: 48em;
         border-top-left-radius: 72em;
+        font-size: min(0.1166rem, 0.2444vmin);
       }
       shadow {
         position: fixed;
@@ -246,7 +252,7 @@
         <span title="number of coins in circulation">quantity</span>
         <a id="timeframe" href="#" title="[change timeframe]">weekly</a>
       </h1>
-      <h2 title="non-real time unfortunately">loading...</h2>
+      <h2 title="alas, non-real time">loading...</h2>
     </header>
     <content></content>
     <shadow left></shadow>

@@ -38,7 +38,7 @@ export function drawPolyline(ctx, points, { filled = false } = {}) {
   ctx.save();
   if (filled) {
     const x1 = points[0][0];
-    const x2 = points.at(-1)[0];
+    const x2 = points[points.length - 1][0];
     const x = (x1 + x2) / 2;
     const allY = points.map(([_, y]) => y);
     const y1 = Math.min(...allY);
@@ -72,23 +72,38 @@ export function drawChart(ctx, points = []) {
   ctx.restore();
 }
 
-export function drawArrow(ctx, [x, y], { widht = 24, height = 4 } = {}) {
+export function drawCross(ctx, [x, y]) {
   ctx.save();
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
-  x--;
-  x--;
-  const arrow = [
-    [x - widht, y + height / 2],
-    [x, y],
-    [x - widht, y - height / 2],
+  const dash1 = [
+    [x - 8, y - 8],
+    [x - 3, y - 3],
+  ];
+  const dash2 = [
+    [x + 8, y - 8],
+    [x + 3, y - 3],
+  ];
+  const dash3 = [
+    [x + 8, y + 8],
+    [x + 3, y + 3],
+  ];
+  const dash4 = [
+    [x - 8, y + 8],
+    [x - 3, y + 3],
   ];
   ctx.strokeStyle = "#492067";
   ctx.lineWidth = 6;
-  drawPolyline(ctx, arrow);
+  drawPolyline(ctx, dash1);
+  drawPolyline(ctx, dash2);
+  drawPolyline(ctx, dash3);
+  drawPolyline(ctx, dash4);
   ctx.strokeStyle = "red";
   ctx.lineWidth = 3;
-  drawPolyline(ctx, arrow);
+  drawPolyline(ctx, dash1);
+  drawPolyline(ctx, dash2);
+  drawPolyline(ctx, dash3);
+  drawPolyline(ctx, dash4);
   ctx.restore();
 }
 
@@ -231,10 +246,18 @@ export function drawToken(ctx, [x, y], token) {
   });
 }
 
+export function drawValue(ctx, [x, y], value = 0) {
+  drawText(ctx, [x, y || 144], {
+    text: addSeparator(value),
+    gradient: true,
+    size: 36,
+  });
+}
+
 export function drawDetails(
   ctx,
   [[x1, y1], [x2, y2]],
-  { data = [], timeframe } = {}
+  { data = [], timeframe, crossVisible = true } = {}
 ) {
   const padding = 48;
   drawRuler(
@@ -251,9 +274,9 @@ export function drawDetails(
   ).valueOf();
   const end = endOfDay(now).valueOf();
   const step = (x2 - x1) / (end - start);
-  const weekly = cutData(data, start);
-  const min = weekly.length > 0 ? Math.min(...weekly.map(([_, v]) => v)) : 0;
-  const max = weekly.length > 0 ? Math.max(...weekly.map(([_, v]) => v)) : 0;
+  const cutted = cutData(data, start);
+  const min = cutted.length > 0 ? Math.min(...cutted.map(([_, v]) => v)) : 0;
+  const max = cutted.length > 0 ? Math.max(...cutted.map(([_, v]) => v)) : 0;
   const textX = (x1 + x2) / 2;
   drawText(ctx, [textX, y1 + 24], {
     text: addSeparator(max),
@@ -263,7 +286,7 @@ export function drawDetails(
   });
   const chartPadding = padding + (timeframe === "weekly" ? 0 : 8);
   const height = y2 - y1 - 3 * chartPadding;
-  const points = weekly.map(([t, v]) => [
+  const points = cutted.map(([t, v]) => [
     x1 + (t - start) * step,
     min === max
       ? (y1 + y2) / 2
@@ -274,18 +297,23 @@ export function drawDetails(
     [x1 - 2, y1 - 2],
     [x2 + 2, y2 + 2],
   ]);
-  drawArrow(ctx, points.at(-1));
-  return {
-    qty: addSeparator(weekly.at(-1)?.[1] || 0),
-    min: addSeparator(min),
-    max: addSeparator(max),
-  };
+  if (crossVisible && points.length > 0) {
+    drawCross(ctx, points[points.length - 1]);
+  }
+  return { cutted, points };
 }
 
 export function drawCard(
   ctx,
   [[x1, y1], [x2, y2]],
-  { token, data, icon, timeframe = "weekly" } = {}
+  {
+    token = "",
+    data = [],
+    icon,
+    timeframe = "weekly",
+    valueVisible = true,
+    crossVisible,
+  } = {}
 ) {
   const padding = 32;
   drawRect(
@@ -298,7 +326,7 @@ export function drawCard(
       fill: "#492067",
     }
   );
-  drawImage(ctx, [padding, padding], icon);
+  if (icon) drawImage(ctx, [padding, padding], icon);
   drawBorder(
     ctx,
     [
@@ -307,12 +335,11 @@ export function drawCard(
     ],
     { radius: 40 }
   );
-  drawToken(ctx, [x2 - padding, 72], token);
-  drawText(ctx, [(x2 - x1) / 2, 144], {
-    text: addSeparator(data.at(-1)?.[1] || 0),
-    gradient: true,
-    size: 36,
-  });
+  if (token) drawToken(ctx, [x2 - padding, 72], token);
+  if (valueVisible && data.length > 0) {
+    const value = data[data.length - 1][1] || 0;
+    drawValue(ctx, [(x2 - x1) / 2, 144], value);
+  }
   return drawDetails(
     ctx,
     [
@@ -322,6 +349,7 @@ export function drawCard(
     {
       data,
       timeframe,
+      crossVisible,
     }
   );
 }
@@ -338,8 +366,16 @@ export function drawPreview(ctx, [[x1, y1], [x2, y2]], { tokens = [] } = {}) {
     }
   );
   tokens.forEach((token, idx) => {
-    drawImage(ctx, [45 + idx * (360 + 15), 0], "./images/" + token + ".png");
+    drawImage(ctx, [30 + idx * (360 + 30), 0], "./images/" + token + ".png");
   });
+}
+
+export function getMousePos(canvas, event) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: ((event.clientX - rect.left) * canvas.width) / rect.width,
+    y: ((event.clientY - rect.top) * canvas.height) / rect.height,
+  };
 }
 
 export function addSeparator(text) {
@@ -369,15 +405,29 @@ export function endOfDay(dirtyDate) {
   return date;
 }
 
-export function cutData(data, start) {
-  const filtered = data.filter(([t]) => t > start);
-  const index = data.findLastIndex(([t]) => t <= start);
-  if (index > -1) {
-    const prev = data[index];
-    const next = data[index + 1];
-    const ratio = (start - prev[0]) / (next[0] - prev[0]);
-    const value = prev[1] + ratio * (next[1] - prev[1]);
-    filtered.unshift([start, Math.round(value)]);
-  }
-  return filtered;
+export function formatDateString(timestamp) {
+  const formatZero = (value) => (value < 10 ? "0" + value : value.toString());
+  const time = new Date(timestamp);
+  const year = time.getFullYear();
+  const month = formatZero(time.getMonth() + 1);
+  const date = formatZero(time.getDate());
+  const hour = formatZero(time.getHours());
+  const minutes = formatZero(time.getMinutes());
+  return (
+    "[ " + year + "." + month + "." + date + " | " + hour + ":" + minutes + " ]"
+  );
+}
+
+export function cutData(data = [], start = 0) {
+  const index = data.findIndex(([t]) => t >= start);
+  if (index <= 0) return data;
+  const slice = data.slice(index);
+  if (data[index][0] === start) return slice;
+  const [prevTime, prevValue] = data[index - 1];
+  const [nextTime, nextValue] = data[index];
+  const ratio = (start - prevTime) / (nextTime - prevTime);
+  let value = prevValue + ratio * (nextValue - prevValue);
+  value = Math.round(value);
+  slice.unshift([start, value]);
+  return slice;
 }

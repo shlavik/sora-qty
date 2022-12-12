@@ -6,9 +6,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
       - uses: denoland/setup-deno@v1
       - run: ./grab.sh
       - run: ./render.sh
-      - uses: stefanzweifel/git-auto-commit-action@v4
+      - id: last-commit-message
+        run: echo "msg=$(git log -1 --pretty=%s)" >> $GITHUB_OUTPUT
+      - if: steps.last-commit-message.outputs.msg != 'Grabbed & Rendered'
+        uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: Qty grabbed & rendered
+          commit_message: "Grabbed & Rendered"
+      - if: steps.last-commit-message.outputs.msg == 'Grabbed & Rendered'
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "Grabbed & Rendered"
+          commit_options: "--amend --no-edit"
+          push_options: "--force"
+          skip_fetch: true

@@ -8,8 +8,8 @@ grab().then((grabbed) => {
   const now = Date.now();
   const append = (value) => (parsed) => (
     parsed.length > 1 &&
-    value[1] === parsed.at(-2)[1] &&
-    value[1] === parsed.at(-1)[1]
+    value[1] === parsed[parsed.length - 2][1] &&
+    value[1] === parsed[parsed.length - 1][1]
       ? parsed.splice(-1, 1, value)
       : parsed.push(value),
     parsed
