@@ -2,7 +2,7 @@ import {
   createCanvas,
   Fonts,
   Image,
-} from "https://deno.land/x/skia_canvas/mod.ts";
+} from "https://deno.land/x/skia_canvas@0.4.1/mod.ts";
 
 import { registerDrawImage, drawCard, drawPreview } from "./utils.js";
 
