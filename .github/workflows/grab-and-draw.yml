@@ -1,6 +1,6 @@
 on:
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "* * * * *"
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -9,6 +9,8 @@ jobs:
         with:
           fetch-depth: 2
       - uses: denoland/setup-deno@v1
+        with:
+          deno-version: "1.29.2"
       - run: ./grab.sh
       - run: ./render.sh
       - id: last-commit-message

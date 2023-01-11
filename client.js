@@ -113,11 +113,14 @@ function updateOverlay(token) {
         });
       }
       const [left, right] = findIndexes(points, x);
-      const [leftTime] = cutted[left];
+      const [leftTime, leftValue] = cutted[left];
       const [rightTime, rightValue] = cutted[right];
-      const [leftX] = points[left];
+      const [leftX, leftY] = points[left];
       const [rightX, rightY] = points[right];
-      const value = rightValue;
+      let ratio = (x - leftX) / (rightX - leftX);
+      if (ratio < 0) ratio = 0;
+      if (ratio > 1) ratio = 1;
+      const value = Math.round(leftValue + ratio * (rightValue - leftValue));
       let crossX = x;
       if (x < points[0][0]) {
         crossX = points[0][0];
@@ -125,10 +128,8 @@ function updateOverlay(token) {
       if (x > points[points.length - 1][0]) {
         crossX = points[points.length - 1][0];
       }
-      const cross = [crossX, rightY];
-      let ratio = (x - leftX) / (rightX - leftX);
-      if (ratio < 0) ratio = 0;
-      if (ratio > 1) ratio = 1;
+      const crossY = leftY + ratio * (rightY - leftY);
+      const cross = [crossX, crossY];
       const timestamp = leftTime + ratio * (rightTime - leftTime);
       drawOverlay({ token, value, cross, timestamp });
     });

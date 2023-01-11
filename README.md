@@ -1,6 +1,6 @@
 # [Sora quantity monitor](https://sora-qty.info)
 
-> Wed Jan 11 2023 10:02:43 GMT+0000 (Greenwich Mean Time)
+> Fri Jan 27 2023 01:02:15 GMT+0000 (Coordinated Universal Time)
 
 [![https://mof.sora.org/qty/xor](./images/xor.png "https://mof.sora.org/qty/xor")](https://mof.sora.org/qty/xor)
 [![https://mof.sora.org/qty/xstusd](./images/xstusd.png "https://mof.sora.org/qty/xstusd")](https://mof.sora.org/qty/xstusd)
