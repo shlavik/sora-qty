@@ -75,7 +75,7 @@ function renderCard(token) {
     ],
     {
       tokens: tokens.filter((token) =>
-        ["xor", "xstusd", "xst"].includes(token)
+        ["xor", "xst", "xstusd"].includes(token)
       ),
     }
   );
