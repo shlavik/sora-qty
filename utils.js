@@ -137,16 +137,16 @@ export function drawRuler(
     date = date < 10 ? "0" + date : date;
     day = subDays(day, timeframe === "weekly" ? 1 : 2);
     const x = lineX - step / 2;
-    const opts = { color, size: 13.4 };
+    const opts = { color, size: 13 };
     if (timeframe === "weekly") {
       const text = month + "." + date;
       drawText(ctx, [x, y1 + 6], { ...opts, text });
-      drawText(ctx, [x, y2 - 6], { ...opts, text });
+      drawText(ctx, [x, y2 - 5], { ...opts, text });
     } else {
       drawText(ctx, [x, y1 + 6], { ...opts, text: month });
-      drawText(ctx, [x, y2 - 6], { ...opts, text: month });
+      drawText(ctx, [x, y2 - 5], { ...opts, text: month });
       drawText(ctx, [x, y1 + 18], { ...opts, text: date });
-      drawText(ctx, [x, y2 - 18], { ...opts, text: date });
+      drawText(ctx, [x, y2 - 17], { ...opts, text: date });
     }
   }
 }
