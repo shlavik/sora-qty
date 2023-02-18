@@ -34,11 +34,11 @@
       }
       ::-webkit-scrollbar-thumb {
         border: #492067 solid 1rem;
-        background-color: white;
         border-radius: 2rem;
+        background-color: white;
       }
       ::-webkit-scrollbar-thumb:active {
-        background-color: #cccccc;
+        background-color: #ccc;
       }
       a {
         color: white;
@@ -67,8 +67,8 @@
         right: 0;
         left: 0;
         display: flex;
-        flex-direction: column;
         height: 20rem;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
       }
@@ -107,30 +107,32 @@
       div:last-child {
         margin-right: 6vmin;
       }
-      div a {
+      div a.source {
         position: absolute;
-        display: none;
         bottom: 0;
+        display: none;
         background-color: #492067;
         color: black;
         font-size: 1.8rem;
         text-decoration: none;
         user-select: none;
       }
-      div:hover a {
+      div:hover a.source {
         display: inline;
       }
       canvas {
         width: 360em;
         height: 630em;
-        aspect-ratio: 36/63;
-        background-image: url(./images/placeholder.png);
         background-position: center;
         background-repeat: no-repeat;
         background-size: contain;
-        border-radius: 48em;
-        border-top-left-radius: 72em;
         font-size: min(0.1166rem, 0.2444vmin);
+      }
+      content.weekly canvas {
+        background-image: url(./images/placeholder_weekly.png);
+      }
+      content.monthly canvas {
+        background-image: url(./images/placeholder_monthly.png);
       }
       shadow {
         position: fixed;
@@ -187,7 +189,7 @@
         transform-origin: 130px 106px;
       }
       @media (hover: hover) and (pointer: fine) {
-        :not(a):not(a *)[title] {
+        :not(a, a *)[title] {
           cursor: help;
         }
         h1 a:hover {
@@ -245,7 +247,9 @@
   <body>
     <header>
       <h1>
-        <a href="https://sora.org" title="[visit Sora site]">Sora</a>
+        <a href="https://sora.org" target="_blank" title="[visit Sora site]"
+          >Sora</a
+        >
         <span title="number of coins in circulation">quantity</span>
         <a id="timeframe" href="#" title="[change timeframe]">weekly</a>
       </h1>

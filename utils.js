@@ -110,7 +110,7 @@ export function drawCross(ctx, [x, y]) {
 export function drawRuler(
   ctx,
   [[x1, y1], [x2, y2]],
-  { timeframe, color = "black", line = 2 } = {}
+  { timeframe, color = "black", line = 2, dateVisible = true } = {}
 ) {
   const segment = timeframe === "weekly" ? 7 : 11;
   const step = (x2 - x1) / segment;
@@ -138,6 +138,7 @@ export function drawRuler(
     day = subDays(day, timeframe === "weekly" ? 1 : 2);
     const x = lineX - step / 2;
     const opts = { color, size: 13 };
+    if (!dateVisible) continue;
     if (timeframe === "weekly") {
       const text = month + "." + date;
       drawText(ctx, [x, y1 + 6], { ...opts, text });
@@ -257,7 +258,13 @@ export function drawValue(ctx, [x, y], value = 0) {
 export function drawDetails(
   ctx,
   [[x1, y1], [x2, y2]],
-  { data = [], timeframe, crossVisible = true } = {}
+  {
+    data = [],
+    timeframe,
+    crossVisible = true,
+    dateVisible = true,
+    minMaxVisible = true,
+  } = {}
 ) {
   const padding = 48;
   drawRuler(
@@ -266,7 +273,7 @@ export function drawDetails(
       [x1, y1 + padding],
       [x2, y2 - padding],
     ],
-    { timeframe }
+    { timeframe, dateVisible }
   );
   const now = Date.now();
   const start = startOfDay(
@@ -277,13 +284,15 @@ export function drawDetails(
   const cutted = cutData(data, start);
   const min = cutted.length > 0 ? Math.min(...cutted.map(([_, v]) => v)) : 0;
   const max = cutted.length > 0 ? Math.max(...cutted.map(([_, v]) => v)) : 0;
-  const textX = (x1 + x2) / 2;
-  drawText(ctx, [textX, y1 + 24], {
-    text: addSeparator(max),
-  });
-  drawText(ctx, [textX, y2 - 24], {
-    text: addSeparator(min),
-  });
+  if (minMaxVisible) {
+    const textX = (x1 + x2) / 2;
+    drawText(ctx, [textX, y1 + 24], {
+      text: addSeparator(max),
+    });
+    drawText(ctx, [textX, y2 - 24], {
+      text: addSeparator(min),
+    });
+  }
   const chartPadding = padding + (timeframe === "weekly" ? 0 : 8);
   const height = y2 - y1 - 3 * chartPadding;
   const points = cutted.map(([t, v]) => [
@@ -311,8 +320,9 @@ export function drawCard(
     data = [],
     icon,
     timeframe = "weekly",
+    crossVisible = true,
+    dateVisible = true,
     valueVisible = true,
-    crossVisible,
   } = {}
 ) {
   const padding = 32;
@@ -337,8 +347,8 @@ export function drawCard(
   );
   if (token) drawToken(ctx, [x2 - padding, 72], token);
   if (valueVisible && data.length > 0) {
-    const value = data[data.length - 1][1] || 0;
-    drawValue(ctx, [(x2 - x1) / 2, 144], value);
+    const value = data[data.length - 1][1];
+    if (value) drawValue(ctx, [(x2 - x1) / 2, 144], value);
   }
   return drawDetails(
     ctx,
@@ -350,6 +360,8 @@ export function drawCard(
       data,
       timeframe,
       crossVisible,
+      dateVisible,
+      minMaxVisible: data.length > 0,
     }
   );
 }
@@ -430,4 +442,22 @@ export function cutData(data = [], start = 0) {
   value = Math.round(value);
   slice.unshift([start, value]);
   return slice;
+}
+
+export function debounce(func, delay) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => func(...args), delay);
+  };
+}
+
+export function throttle(func, delay) {
+  let wait = false;
+  return (...args) => {
+    if (wait) return;
+    func(...args);
+    wait = true;
+    setTimeout(() => (wait = false), delay);
+  };
 }

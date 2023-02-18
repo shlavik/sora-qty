@@ -81,3 +81,22 @@ function renderCard(token) {
   );
   canvas.save("./images/preview.png");
 })();
+
+["weekly", "monthly"].forEach(renderPlaceholder);
+
+function renderPlaceholder(timeframe) {
+  const canvas = createCanvas(360, 630);
+  const context = canvas.getContext("2d");
+  drawCard(
+    context,
+    [
+      [0, 0],
+      [canvas.width, canvas.height],
+    ],
+    {
+      timeframe,
+      dateVisible: false,
+    }
+  );
+  canvas.save("./images/placeholder_" + timeframe + ".png");
+}

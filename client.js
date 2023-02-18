@@ -4,6 +4,7 @@ import {
   drawValue,
   getMousePos,
   formatDateString,
+  debounce,
 } from "./utils.js";
 
 const documentEl = document.documentElement;
@@ -19,7 +20,20 @@ updateRem();
 
 window.addEventListener("resize", updateRem);
 
-window.addEventListener("wheel", ({ deltaX, deltaY }) => {
+function getScrollPercentage() {
+  const { clientWidth, scrollLeft, scrollWidth } = documentEl;
+  return Math.round((scrollLeft / (scrollWidth - clientWidth)) * 1000);
+}
+
+const updateScrollDebounced = debounce(
+  () => localStorage.setItem("scroll", getScrollPercentage()),
+  80
+);
+
+window.addEventListener("scroll", updateScrollDebounced);
+
+window.addEventListener("wheel", (event) => {
+  const { deltaX, deltaY } = event;
   documentEl.scrollLeft += deltaX + deltaY;
 });
 
@@ -38,12 +52,14 @@ window.addEventListener("keydown", ({ key }) => {
 
 let timeframe =
   localStorage.getItem("timeframe") === "monthly" ? "monthly" : "weekly";
+let scroll = Number(localStorage.getItem("scroll")) || 0;
 
 timeframeEl.innerText = timeframe;
 
 timeframeEl.addEventListener("click", (event) => {
   event.preventDefault();
   timeframe = timeframe === "weekly" ? "monthly" : "weekly";
+  contentEl.className = timeframe;
   localStorage.setItem("timeframe", timeframe);
   timeframeEl.innerText = timeframe;
   tokens.forEach((token) => drawUnderlay({ token }).then(drawOverlay));
@@ -67,6 +83,7 @@ fetchTokens().then((value) => {
 
 function createCards() {
   if (!tokens || tokens.length < 1) return;
+  contentEl.className = timeframe;
   tokens.forEach((token) => {
     const canvas = document.createElement("canvas");
     canvases[token] = canvas;
@@ -76,6 +93,7 @@ function createCards() {
     canvas.addEventListener("mouseleave", resetOverlay(token), false);
     const link = document.createElement("a");
     links[token] = link;
+    link.className = "source";
     link.href = "https://mof.sora.org/qty/" + token;
     link.title = "[view source]";
     link.innerText = token;
@@ -87,9 +105,16 @@ function createCards() {
     icons[token] = icon;
     icon.src = "./images/icons/" + token + ".png";
     icon.addEventListener("load", () => {
+      drawUnderlay({ token });
       fetchData(token).then(drawUnderlay).then(drawOverlay);
     });
   });
+  if (scroll > 0) {
+    const { clientWidth, scrollWidth } = documentEl;
+    const setScroll = () =>
+      (documentEl.scrollLeft = ((scrollWidth - clientWidth) * scroll) / 1000);
+    requestAnimationFrame(setScroll);
+  }
 }
 
 function updateOverlay(token) {
@@ -155,9 +180,7 @@ function findIndexes(points = [], x = 0) {
 }
 
 function resetOverlay(token) {
-  return () => {
-    drawUnderlay({ token }).then(drawOverlay);
-  };
+  return () => drawUnderlay({ token }).then(drawOverlay);
 }
 
 function fetchTokens() {
@@ -165,9 +188,7 @@ function fetchTokens() {
     .then((response) => response.text())
     .then(JSON.parse)
     .catch(() => {
-      setTimeout(() => {
-        window.location = window.location;
-      }, 1000);
+      setTimeout(() => (window.location = window.location), 1000);
       return [];
     });
 }
@@ -213,7 +234,7 @@ async function drawUnderlay({ token, data = dataset[token] } = {}) {
       [0, 0],
       [canvas.width, canvas.height],
     ],
-    { token, data, icon, timeframe, valueVisible: false, crossVisible: false }
+    { token, data, icon, timeframe, crossVisible: false, valueVisible: false }
   );
   cuttedset[token] = cutted;
   pointsset[token] = points;
@@ -242,7 +263,7 @@ function drawOverlay({
   cross = [],
   timestamp = 0,
 }) {
-  drawValue(context, [180, 144], value);
+  if (value) drawValue(context, [180, 144], value);
   drawCross(context, cross);
   if (!timestamp) return;
   const link = links[token];
