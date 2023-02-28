@@ -1,6 +1,6 @@
 # [Sora quantity monitor](https://sora-qty.info)
 
-> Tue Feb 28 2023 22:53:46 GMT+0000 (Coordinated Universal Time)
+> Sun Mar 12 2023 09:02:47 GMT+0000 (Coordinated Universal Time)
 
 [![https://mof.sora.org/qty/xor](./images/xor.png "https://mof.sora.org/qty/xor")](https://mof.sora.org/qty/xor)
 [![https://mof.sora.org/qty/val](./images/val.png "https://mof.sora.org/qty/val")](https://mof.sora.org/qty/val)
@@ -13,3 +13,5 @@
 [![https://mof.sora.org/qty/usdc](./images/usdc.png "https://mof.sora.org/qty/usdc")](https://mof.sora.org/qty/usdc)
 [![https://mof.sora.org/qty/usdt](./images/usdt.png "https://mof.sora.org/qty/usdt")](https://mof.sora.org/qty/usdt)
 [![https://mof.sora.org/qty/busd](./images/busd.png "https://mof.sora.org/qty/busd")](https://mof.sora.org/qty/busd)
+[![https://mof.sora.org/qty/tusd](./images/tusd.png "https://mof.sora.org/qty/tusd")](https://mof.sora.org/qty/tusd)
+[![https://mof.sora.org/qty/lusd](./images/lusd.png "https://mof.sora.org/qty/lusd")](https://mof.sora.org/qty/lusd)
