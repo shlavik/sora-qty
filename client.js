@@ -52,7 +52,6 @@ window.addEventListener("keydown", ({ key }) => {
 
 let timeframe =
   localStorage.getItem("timeframe") === "monthly" ? "monthly" : "weekly";
-let scroll = Number(localStorage.getItem("scroll")) || 0;
 
 timeframeEl.innerText = timeframe;
 
@@ -81,34 +80,37 @@ fetchTokens().then((value) => {
   setInterval(() => checkTimestamp(), 10000);
 });
 
+function createCard(token) {
+  const canvas = document.createElement("canvas");
+  canvases[token] = canvas;
+  canvas.width = 360;
+  canvas.height = 630;
+  canvas.addEventListener("mousemove", updateOverlay(token), false);
+  canvas.addEventListener("mouseleave", resetOverlay(token), false);
+  const link = document.createElement("a");
+  links[token] = link;
+  link.className = "source";
+  link.href = "https://mof.sora.org/qty/" + token;
+  link.title = "[view source]";
+  link.innerText = token;
+  const container = document.createElement("div");
+  container.appendChild(canvas);
+  container.appendChild(link);
+  contentEl.appendChild(container);
+  const icon = document.createElement("img");
+  icons[token] = icon;
+  icon.src = "./images/icons/" + token + ".png";
+  icon.addEventListener("load", () => {
+    drawUnderlay({ token });
+    fetchData(token).then(drawUnderlay).then(drawOverlay);
+  });
+}
+
 function createCards() {
   if (!tokens || tokens.length < 1) return;
   contentEl.className = timeframe;
-  tokens.forEach((token) => {
-    const canvas = document.createElement("canvas");
-    canvases[token] = canvas;
-    canvas.width = 360;
-    canvas.height = 630;
-    canvas.addEventListener("mousemove", updateOverlay(token), false);
-    canvas.addEventListener("mouseleave", resetOverlay(token), false);
-    const link = document.createElement("a");
-    links[token] = link;
-    link.className = "source";
-    link.href = "https://mof.sora.org/qty/" + token;
-    link.title = "[view source]";
-    link.innerText = token;
-    const container = document.createElement("div");
-    container.appendChild(canvas);
-    container.appendChild(link);
-    contentEl.appendChild(container);
-    const icon = document.createElement("img");
-    icons[token] = icon;
-    icon.src = "./images/icons/" + token + ".png";
-    icon.addEventListener("load", () => {
-      drawUnderlay({ token });
-      fetchData(token).then(drawUnderlay).then(drawOverlay);
-    });
-  });
+  tokens.forEach(createCard);
+  const scroll = Number(localStorage.getItem("scroll")) || 0;
   if (scroll > 0) {
     const { clientWidth, scrollWidth } = documentEl;
     const setScroll = () =>

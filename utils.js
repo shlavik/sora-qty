@@ -137,16 +137,17 @@ export function drawRuler(
     date = date < 10 ? "0" + date : date;
     day = subDays(day, timeframe === "weekly" ? 1 : 2);
     const x = lineX - step / 2;
-    const opts = { color, size: 13 };
+    const restrict = typeof Deno === "undefined" ? 38 : undefined;
+    const opts = { color, size: 14, restrict };
     if (!dateVisible) continue;
     if (timeframe === "weekly") {
       const text = month + "." + date;
-      drawText(ctx, [x, y1 + 6], { ...opts, text });
+      drawText(ctx, [x, y1 + 7], { ...opts, text });
       drawText(ctx, [x, y2 - 5], { ...opts, text });
     } else {
-      drawText(ctx, [x, y1 + 6], { ...opts, text: month });
+      drawText(ctx, [x, y1 + 7], { ...opts, text: month });
       drawText(ctx, [x, y2 - 5], { ...opts, text: month });
-      drawText(ctx, [x, y1 + 18], { ...opts, text: date });
+      drawText(ctx, [x, y1 + 19], { ...opts, text: date });
       drawText(ctx, [x, y2 - 17], { ...opts, text: date });
     }
   }
@@ -215,7 +216,15 @@ export function drawBorder(
 export function drawText(
   ctx,
   [x, y],
-  { text, align = "center", color = "white", gradient = false, size = 20 } = {}
+  {
+    text,
+    align = "center",
+    color = "white",
+    font = "sora",
+    gradient = false,
+    size = 20,
+    restrict,
+  } = {}
 ) {
   ctx.save();
   if (gradient) {
@@ -225,10 +234,10 @@ export function drawText(
     gradient.addColorStop(1, "red");
   }
   ctx.fillStyle = gradient ? gradient : color;
-  ctx.font = size + "px sora";
+  ctx.font = size + "px " + font;
   ctx.textAlign = align;
   ctx.textBaseline = "middle";
-  ctx.fillText(text, x, y);
+  ctx.fillText(text, x, y, restrict);
   ctx.restore();
 }
 
