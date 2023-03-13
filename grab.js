@@ -42,5 +42,6 @@ function grab() {
     result
       .filter(({ status }) => status === "fulfilled")
       .map(({ value }) => value)
+      .filter(([_, value]) => value)
   );
 }
