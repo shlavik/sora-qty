@@ -1,6 +1,6 @@
 # [Sora quantity monitor](https://sora-qty.info)
 
-> Sat Mar 18 2023 18:13:20 GMT+0000 (Coordinated Universal Time)
+> Thu Mar 30 2023 10:47:26 GMT+0000 (Coordinated Universal Time)
 
 [![https://mof.sora.org/qty/xor](./images/xor.png "https://mof.sora.org/qty/xor")](https://mof.sora.org/qty/xor)
 [![https://mof.sora.org/qty/val](./images/val.png "https://mof.sora.org/qty/val")](https://mof.sora.org/qty/val)
@@ -14,4 +14,6 @@
 [![https://mof.sora.org/qty/usdt](./images/usdt.png "https://mof.sora.org/qty/usdt")](https://mof.sora.org/qty/usdt)
 [![https://mof.sora.org/qty/busd](./images/busd.png "https://mof.sora.org/qty/busd")](https://mof.sora.org/qty/busd)
 [![https://mof.sora.org/qty/tusd](./images/tusd.png "https://mof.sora.org/qty/tusd")](https://mof.sora.org/qty/tusd)
+[![https://mof.sora.org/qty/frax](./images/frax.png "https://mof.sora.org/qty/frax")](https://mof.sora.org/qty/frax)
 [![https://mof.sora.org/qty/lusd](./images/lusd.png "https://mof.sora.org/qty/lusd")](https://mof.sora.org/qty/lusd)
+[![https://mof.sora.org/qty/caps](./images/caps.png "https://mof.sora.org/qty/caps")](https://mof.sora.org/qty/caps)
