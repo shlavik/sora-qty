@@ -2,11 +2,11 @@ import {
   createCanvas,
   Fonts,
   Image,
-} from "https://deno.land/x/skia_canvas@0.4.1/mod.ts";
+} from "https://deno.land/x/skia_canvas@0.5.4/mod.ts";
 
 import { registerDrawImage, drawCard, drawPreview } from "./utils.js";
 
-import tokens from "./tokens.json" assert { type: "json" };
+const tokens = ["xor", "val", "pswap", "tbcd", "xst", "xstusd"];
 
 const dataset = Object.fromEntries(
   await Promise.all(
@@ -74,9 +74,7 @@ function renderCard(token) {
       [canvas.width, canvas.height],
     ],
     {
-      tokens: tokens.filter((token) =>
-        ["xor", "xst", "xstusd"].includes(token)
-      ),
+      tokens: ["xor", "xst", "xstusd"],
     }
   );
   canvas.save("./images/preview.png");

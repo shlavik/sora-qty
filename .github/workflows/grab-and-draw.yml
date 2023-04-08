@@ -11,9 +11,10 @@ jobs:
           fetch-depth: 2
       - uses: denoland/setup-deno@v1
         with:
-          deno-version: "1.29.2"
+          deno-version: "1.34.2"
       - run: ./grab.sh
       - run: ./render.sh
+        continue-on-error: true
       - id: last-commit-message
         run: echo "msg=$(git log -1 --pretty=%s)" >> $GITHUB_OUTPUT
       - if: steps.last-commit-message.outputs.msg != 'Grabbed & Rendered'

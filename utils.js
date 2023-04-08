@@ -137,8 +137,7 @@ export function drawRuler(
     date = date < 10 ? "0" + date : date;
     day = subDays(day, timeframe === "weekly" ? 1 : 2);
     const x = lineX - step / 2;
-    const restrict = typeof Deno === "undefined" ? 38 : undefined;
-    const opts = { color, size: 14, restrict };
+    const opts = { color, size: 14, restrict: 38 };
     if (!dateVisible) continue;
     if (timeframe === "weekly") {
       const text = month + "." + date;
