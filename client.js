@@ -74,7 +74,11 @@ const underlays = {};
 const links = {};
 
 fetchTokens().then((value) => {
-  tokens.push(...value);
+  tokens.push(
+    ...value.filter(
+      (token) => !["busd", "tusd", "frax", "lusd", "husd"].includes(token)
+    )
+  );
   createCards();
   checkTimestamp();
   setInterval(() => checkTimestamp(), 10000);

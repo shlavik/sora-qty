@@ -136,7 +136,8 @@ export function drawRuler(
     let date = day.getDate();
     date = date < 10 ? "0" + date : date;
     day = subDays(day, timeframe === "weekly" ? 1 : 2);
-    const x = lineX - step / 2;
+    let x = lineX - step / 2;
+    x = typeof Deno === "undefined" ? x : x + 2;
     const opts = { color, size: 14, restrict: 38 };
     if (!dateVisible) continue;
     if (timeframe === "weekly") {
