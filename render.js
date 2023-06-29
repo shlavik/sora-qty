@@ -74,7 +74,10 @@ function renderCard(token) {
       [canvas.width, canvas.height],
     ],
     {
-      tokens: ["xor", "xst", "xstusd"],
+      tokens:
+        Math.random() < 0.5
+          ? ["xor", "val", "pswap"]
+          : ["xor", "xst", "xstusd"],
     }
   );
   canvas.save("./images/preview.png");
