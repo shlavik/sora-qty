@@ -94,10 +94,7 @@ function renderPlaceholder(timeframe) {
       [0, 0],
       [canvas.width, canvas.height],
     ],
-    {
-      timeframe,
-      dateVisible: false,
-    }
+    { timeframe }
   );
   canvas.save("./images/placeholder_" + timeframe + ".png");
 }

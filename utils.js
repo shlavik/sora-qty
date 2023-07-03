@@ -63,7 +63,7 @@ export function drawChart(ctx, points = []) {
   ctx.save();
   ctx.lineJoin = "round";
   drawPolyline(ctx, points, { filled: true });
-  ctx.strokeStyle = "#492067";
+  ctx.strokeStyle = "#51276C";
   ctx.lineWidth = 5;
   drawPolyline(ctx, points);
   ctx.strokeStyle = "yellow";
@@ -92,7 +92,7 @@ export function drawCross(ctx, [x, y]) {
     [x - 8, y + 8],
     [x - 3, y + 3],
   ];
-  ctx.strokeStyle = "#492067";
+  ctx.strokeStyle = "#51276C";
   ctx.lineWidth = 6;
   drawPolyline(ctx, dash1);
   drawPolyline(ctx, dash2);
@@ -110,7 +110,7 @@ export function drawCross(ctx, [x, y]) {
 export function drawRuler(
   ctx,
   [[x1, y1], [x2, y2]],
-  { timeframe, color = "black", line = 2, dateVisible = true } = {}
+  { timeframe, color = "black", line = 2 } = {}
 ) {
   const segment = timeframe === "weekly" ? 7 : 11;
   const step = (x2 - x1) / segment;
@@ -137,9 +137,8 @@ export function drawRuler(
     date = date < 10 ? "0" + date : date;
     day = subDays(day, timeframe === "weekly" ? 1 : 2);
     let x = lineX - step / 2;
-    x = typeof Deno === "undefined" ? x : x + 2;
+    x = denoFix(x, month, date);
     const opts = { color, size: 14, restrict: 38 };
-    if (!dateVisible) continue;
     if (timeframe === "weekly") {
       const text = month + "." + date;
       drawText(ctx, [x, y1 + 7], { ...opts, text });
@@ -151,6 +150,12 @@ export function drawRuler(
       drawText(ctx, [x, y2 - 17], { ...opts, text: date });
     }
   }
+}
+
+function denoFix(x, month, date) {
+  if (typeof Deno === "undefined") return x;
+  if (month.toString().includes("1") || date.toString().includes("1")) return x;
+  return x + 2;
 }
 
 export function drawBorder(
@@ -267,13 +272,7 @@ export function drawValue(ctx, [x, y], value = 0) {
 export function drawDetails(
   ctx,
   [[x1, y1], [x2, y2]],
-  {
-    data = [],
-    timeframe,
-    crossVisible = true,
-    dateVisible = true,
-    minMaxVisible = true,
-  } = {}
+  { data = [], timeframe, crossVisible = true, minMaxVisible = true } = {}
 ) {
   const padding = 48;
   drawRuler(
@@ -282,7 +281,7 @@ export function drawDetails(
       [x1, y1 + padding],
       [x2, y2 - padding],
     ],
-    { timeframe, dateVisible }
+    { timeframe }
   );
   const now = Date.now();
   const start = startOfDay(
@@ -330,7 +329,6 @@ export function drawCard(
     icon,
     timeframe = "weekly",
     crossVisible = true,
-    dateVisible = true,
     valueVisible = true,
   } = {}
 ) {
@@ -342,7 +340,7 @@ export function drawCard(
       [x2, y2],
     ],
     {
-      fill: "#492067",
+      fill: "#51276C",
     }
   );
   if (icon) drawImage(ctx, [padding, padding], icon);
@@ -369,7 +367,6 @@ export function drawCard(
       data,
       timeframe,
       crossVisible,
-      dateVisible,
       minMaxVisible: data.length > 0,
     }
   );
@@ -383,7 +380,7 @@ export function drawPreview(ctx, [[x1, y1], [x2, y2]], { tokens = [] } = {}) {
       [x2, y2],
     ],
     {
-      fill: "#492067",
+      fill: "#51276C",
     }
   );
   tokens.forEach((token, idx) => {
