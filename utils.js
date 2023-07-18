@@ -146,8 +146,8 @@ export function drawRuler(
     } else {
       drawText(ctx, [x, y1 + 7], { ...opts, text: month });
       drawText(ctx, [x, y2 - 5], { ...opts, text: month });
-      drawText(ctx, [x, y1 + 19], { ...opts, text: date });
-      drawText(ctx, [x, y2 - 17], { ...opts, text: date });
+      drawText(ctx, [x, y1 + 20], { ...opts, text: date });
+      drawText(ctx, [x, y2 - 18], { ...opts, text: date });
     }
   }
 }
