@@ -1,0 +1,69 @@
+{
+  "dir": "ltr",
+  "lang": "en",
+  "name": "Sora Quantity Monitor",
+  "short_name": "SORA QTY",
+  "description": "Check circulating supply of Sora ecosystem tokens",
+  "theme_color": "#ffffff",
+  "background_color": "#51276c",
+  "display": "minimal-ui",
+  "scope": "/",
+  "start_url": "/",
+  "categories": ["finance", "utilities", "web3"],
+  "icons": [
+    {
+      "src": "images/icons/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "48x48 72x72 96x96 128x128 192x192 384x384 512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "images/icons/icon_x512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "images/icons/icon_x48_maskable.png",
+      "type": "image/png",
+      "sizes": "48x48",
+      "purpose": "maskable"
+    },
+    {
+      "src": "images/icons/icon_x72_maskable.png",
+      "type": "image/png",
+      "sizes": "72x72",
+      "purpose": "maskable"
+    },
+    {
+      "src": "images/icons/icon_x96_maskable.png",
+      "type": "image/png",
+      "sizes": "96x96",
+      "purpose": "maskable"
+    },
+    {
+      "src": "images/icons/icon_x128_maskable.png",
+      "type": "image/png",
+      "sizes": "128x128",
+      "purpose": "maskable"
+    },
+    {
+      "src": "images/icons/icon_x192_maskable.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "maskable"
+    },
+    {
+      "src": "images/icons/icon_x384_maskable.png",
+      "type": "image/png",
+      "sizes": "384x384",
+      "purpose": "maskable"
+    },
+    {
+      "src": "images/icons/icon_x512_maskable.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    }
+  ]
+}

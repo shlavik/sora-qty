@@ -8,36 +8,49 @@ import {
 } from "./utils.js";
 
 const documentEl = document.documentElement;
-const timeframeEl = document.querySelector("a#timeframe");
-const h2El = document.querySelector("h2");
+const headerEl = document.querySelector("header");
+const timeframeEl = document.querySelector("timeframe");
+const overlayEl = document.querySelector("overlay");
+const updateEl = document.querySelector("update");
 const contentEl = document.querySelector("content");
 
-const updateRem = () => {
-  documentEl.style.setProperty("font-size", window.innerHeight * 0.01 + "px");
-};
+function updateRem() {
+  setTimeout(() => {
+    const size = 0.01 * documentEl.clientHeight;
+    const diff = size % 0.1;
+    documentEl.style.setProperty("font-size", size - diff + "px");
+  });
+}
 
 updateRem();
 
-window.addEventListener("resize", updateRem);
+addEventListener("resize", updateRem);
+
+function updateHeader(value) {
+  headerEl.style.left = Math.round(value) + "px";
+}
 
 function getScrollPercentage() {
   const { clientWidth, scrollLeft, scrollWidth } = documentEl;
-  return Math.round((scrollLeft / (scrollWidth - clientWidth)) * 1000);
+  return Math.round((scrollLeft / (scrollWidth - clientWidth)) * 100000000);
 }
 
-const updateScrollDebounced = debounce(
+const updateLocalStorageScrollDebounced = debounce(
   () => localStorage.setItem("scroll", getScrollPercentage()),
-  80
+  100
 );
 
-window.addEventListener("scroll", updateScrollDebounced);
+addEventListener("scroll", () => {
+  updateHeader(documentEl.scrollLeft);
+  updateLocalStorageScrollDebounced();
+});
 
-window.addEventListener("wheel", (event) => {
+addEventListener("wheel", (event) => {
   const { deltaX, deltaY } = event;
   documentEl.scrollLeft += deltaX + deltaY;
 });
 
-window.addEventListener("keydown", ({ key }) => {
+addEventListener("keydown", ({ key }) => {
   switch (key) {
     case "Home":
       return (documentEl.scrollLeft = 0);
@@ -50,17 +63,38 @@ window.addEventListener("keydown", ({ key }) => {
   }
 });
 
-let timeframe =
-  localStorage.getItem("timeframe") === "monthly" ? "monthly" : "weekly";
+overlayEl.addEventListener("mousedown", (event) => event.preventDefault());
+overlayEl.addEventListener("mouseup", () => overlayEl.focus());
+overlayEl.addEventListener("focus", () => {
+  overlayEl.classList.add("focused");
+  overlayEl.classList.remove("reverse");
+});
+overlayEl.addEventListener("blur", () => {
+  overlayEl.classList.remove("focused");
+  overlayEl.classList.add("reverse");
+});
+overlayEl.addEventListener("mouseenter", () => {
+  overlayEl.classList.remove("reverse");
+});
+overlayEl.addEventListener("mouseleave", () => {
+  overlayEl.classList.contains("focused") && overlayEl.classList.add("reverse");
+});
 
-timeframeEl.innerText = timeframe;
+let timeframe =
+  {
+    "1w": "1w",
+    "1m": "1m",
+    "3m": "3m",
+    "1y": "1y",
+  }[localStorage.getItem("timeframe")] || "1w";
+timeframeEl.dataset.timeframe = timeframe;
 
 timeframeEl.addEventListener("click", (event) => {
   event.preventDefault();
-  timeframe = timeframe === "weekly" ? "monthly" : "weekly";
-  contentEl.className = timeframe;
+  if (!event.target.id) return;
+  timeframe = event.target.id;
+  timeframeEl.dataset.timeframe = timeframe;
   localStorage.setItem("timeframe", timeframe);
-  timeframeEl.innerText = timeframe;
   tokens.forEach((token) => drawUnderlay({ token }).then(drawOverlay));
 });
 
@@ -97,7 +131,7 @@ function createCard(token) {
   link.href = "https://mof.sora.org/qty/" + token;
   link.title = "[view source]";
   link.innerText = token;
-  const container = document.createElement("div");
+  const container = document.createElement("card");
   container.appendChild(canvas);
   container.appendChild(link);
   contentEl.appendChild(container);
@@ -110,17 +144,29 @@ function createCard(token) {
   });
 }
 
+function updateHeaderTransition() {
+  setTimeout(
+    () =>
+      (headerEl.style.transition =
+        "width ease-in-out 600ms 200ms, left ease-in-out 600ms 200ms")
+  );
+}
+
 function createCards() {
   if (!tokens || tokens.length < 1) return;
   contentEl.className = timeframe;
   tokens.forEach(createCard);
   const scroll = Number(localStorage.getItem("scroll")) || 0;
-  if (scroll > 0) {
-    const { clientWidth, scrollWidth } = documentEl;
-    const setScroll = () =>
-      (documentEl.scrollLeft = ((scrollWidth - clientWidth) * scroll) / 1000);
-    requestAnimationFrame(setScroll);
-  }
+  if (scroll === 0) return updateHeaderTransition();
+  const { clientWidth, scrollWidth } = documentEl;
+  setTimeout(() => {
+    const scrollLeft = Math.round(
+      ((scrollWidth - clientWidth) * scroll) / 100000000
+    );
+    documentEl.scrollLeft = scrollLeft;
+    updateHeader(scrollLeft);
+    updateHeaderTransition();
+  });
 }
 
 function updateOverlay(token) {
@@ -128,8 +174,8 @@ function updateOverlay(token) {
   const context = canvas.getContext("2d");
   let timeout;
   return (event) => {
-    if (timeout) window.cancelAnimationFrame(timeout);
-    timeout = window.requestAnimationFrame(() => {
+    if (timeout) cancelAnimationFrame(timeout);
+    timeout = requestAnimationFrame(() => {
       if (underlays[token]) context.putImageData(underlays[token], 0, 0);
       const cutted = cuttedset[token] || [];
       const points = pointsset[token] || [];
@@ -194,7 +240,7 @@ function fetchTokens() {
     .then((response) => response.text())
     .then(JSON.parse)
     .catch(() => {
-      setTimeout(() => (window.location = window.location), 1000);
+      setTimeout(() => (window.location = location), 1000);
       return [];
     });
 }
@@ -205,11 +251,9 @@ function checkTimestamp() {
     .then(JSON.parse)
     .catch(() => {})
     .then((timestamp) => {
-      h2El.innerText =
-        "last update: " +
-        (timestamp
-          ? Math.round((Date.now() - timestamp) / 60000) + "m ago"
-          : "N/A");
+      updateEl.innerText = timestamp
+        ? Math.round((Date.now() - timestamp) / 60000) + "m ago"
+        : "N/A";
       if (!timestamp || timestamp === checkTimestamp.timestamp) return;
       if (checkTimestamp.timestamp && tokens) {
         tokens.forEach((token) => {

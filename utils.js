@@ -112,7 +112,7 @@ export function drawRuler(
   [[x1, y1], [x2, y2]],
   { timeframe, color = "black", line = 2 } = {}
 ) {
-  const segment = timeframe === "weekly" ? 7 : 11;
+  const segment = timeframe === "1w" ? 7 : 11;
   const step = (x2 - x1) / segment;
   let day = new Date();
   for (let i = segment; i > 0; i--) {
@@ -130,16 +130,16 @@ export function drawRuler(
         }
       );
     }
-    if (timeframe === "monthly") day = subDays(day, 1);
+    if (timeframe === "1m") day = subDays(day, 1);
     let month = day.getMonth() + 1;
     month = month < 10 ? "0" + month : month;
     let date = day.getDate();
     date = date < 10 ? "0" + date : date;
-    day = subDays(day, timeframe === "weekly" ? 1 : 2);
+    day = subDays(day, timeframe === "1w" ? 1 : 2);
     let x = lineX - step / 2;
     x = denoFix(x, month, date);
     const opts = { color, size: 14, restrict: 38 };
-    if (timeframe === "weekly") {
+    if (timeframe === "1w") {
       const text = month + "." + date;
       drawText(ctx, [x, y1 + 7], { ...opts, text });
       drawText(ctx, [x, y2 - 5], { ...opts, text });
@@ -284,9 +284,7 @@ export function drawDetails(
     { timeframe }
   );
   const now = Date.now();
-  const start = startOfDay(
-    subDays(now, timeframe === "weekly" ? 6 : 32)
-  ).valueOf();
+  const start = startOfDay(subDays(now, timeframe === "1w" ? 6 : 32)).valueOf();
   const end = endOfDay(now).valueOf();
   const step = (x2 - x1) / (end - start);
   const cutted = cutData(data, start);
@@ -301,7 +299,7 @@ export function drawDetails(
       text: addSeparator(min),
     });
   }
-  const chartPadding = padding + (timeframe === "weekly" ? 0 : 8);
+  const chartPadding = padding + (timeframe === "1w" ? 0 : 8);
   const height = y2 - y1 - 3 * chartPadding;
   const points = cutted.map(([t, v]) => [
     x1 + (t - start) * step,
@@ -327,7 +325,7 @@ export function drawCard(
     token = "",
     data = [],
     icon,
-    timeframe = "weekly",
+    timeframe = "1w",
     crossVisible = true,
     valueVisible = true,
   } = {}
