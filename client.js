@@ -129,6 +129,7 @@ function createCard(token) {
   links[token] = link;
   link.className = "source";
   link.href = "https://mof.sora.org/qty/" + token;
+  link.target = "_blank";
   link.title = "[view source]";
   link.innerText = token;
   const container = document.createElement("card");

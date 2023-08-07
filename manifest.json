@@ -2,7 +2,7 @@
   "dir": "ltr",
   "lang": "en",
   "name": "Sora Quantity Monitor",
-  "short_name": "SORA QTY",
+  "short_name": "Sora Quantity",
   "description": "Check circulating supply of Sora ecosystem tokens",
   "theme_color": "#ffffff",
   "background_color": "#51276c",
