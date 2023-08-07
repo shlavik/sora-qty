@@ -62,8 +62,8 @@
       }
       html {
         --color-background: #51276c;
-        --color-primary: #ffffff;
-        --color-secondary: #000000;
+        --color-primary: #fff;
+        --color-secondary: #000;
         --color-accent: #f24197;
         --color-danger: #e3232c;
         --color-warning: #e3d823;
@@ -83,10 +83,13 @@
         --header-width: calc(100vw - 2 * var(--header-padding));
         --header-padding: calc(2 * var(--card-gap));
 
-        font-size: 1vh;
-        user-select: none;
+        margin: 0;
         background-color: var(--color-background);
         color: var(--color-primary);
+        font-size: 1vh;
+        user-select: none;
+        overflow-x: scroll;
+        overflow-y: hidden;
       }
       body {
         display: flex;
@@ -96,10 +99,10 @@
         justify-content: space-evenly;
         margin: 0;
         font-family: sora;
-        overflow-y: hidden;
       }
       header {
         position: relative;
+        z-index: 99;
         display: flex;
         width: var(--header-width);
         justify-content: space-between;
@@ -182,28 +185,32 @@
       }
       overlay handle svg {
         display: flex;
-        align-items: baseline;
-        justify-content: center;
         width: 100%;
         height: 100%;
+        align-items: baseline;
+        justify-content: center;
         border-radius: 50%;
         color: var(--color-background);
         font-size: 0.75em;
         transition: transform ease-in-out 300ms;
       }
+      /* overlay:focus-within handle svg, */
       overlay.focused handle svg {
         background-color: var(--color-background);
         color: var(--color-primary);
         transform: rotate(60deg);
       }
+      /* overlay:focus-within handle:active svg, */
       overlay.focused handle:active svg {
         background-color: var(--color-background);
         filter: brightness(0.8);
       }
+      /* overlay:not(:focus-within) handle:active svg, */
       overlay:not(.focused) handle:active svg {
         color: var(--color-success);
         filter: brightness(0.8);
       }
+      /* overlay:not(:focus-within) handle:hover svg, */
       overlay:not(.focused) handle:hover svg {
         color: var(--color-success);
       }
@@ -212,23 +219,32 @@
         z-index: -1;
         top: 1em;
         right: 0;
+        min-width: calc(var(--card-width) - 2 * var(--card-padding));
         padding-top: var(--card-margin);
         margin: 0;
-        min-width: calc(var(--card-width) - 2 * var(--card-padding));
-        transform: translateX(0%) translateY(-0%) scale(0) rotate(-60deg);
         pointer-events: none;
+        transform: translateX(0%) translateY(-0%) scale(0) rotate(-60deg);
         transform-origin: calc(100% - var(--card-margin))
           calc(2 * var(--card-margin));
       }
+      /* overlay:focus-within dropdown, */
       overlay.focused dropdown {
         animation: dropdown-in ease-in-out 300ms forwards;
         pointer-events: all;
       }
+      /* overlay:not(:focus-within).reverse dropdown, */
       overlay:not(.focused).reverse dropdown {
-        pointer-events: none;
         animation: dropdown-out ease-in-out 250ms forwards;
+        pointer-events: none;
       }
       overlay dropdown ul {
+        display: flex;
+        min-width: calc(
+          var(--card-width) - 2 * var(--card-margin) - 2 * var(--card-padding)
+        );
+        max-width: var(--header-width);
+        flex-direction: column;
+        padding: var(--card-margin);
         border-radius: 1em;
         margin: 0;
         background-color: var(--color-primary);
@@ -236,39 +252,36 @@
           var(--color-background);
         color: var(--color-secondary);
         font-size: 0.5em;
-        min-width: calc(
-          var(--card-width) - 2 * var(--card-margin) - 2 * var(--card-padding)
-        );
-        max-width: var(--header-width);
-        padding: var(--card-margin);
         list-style: none;
-        list-style: none;
-        display: flex;
-        flex-direction: column;
       }
       overlay dropdown li {
-        line-height: 2.25;
         display: flex;
+        line-height: 2;
       }
       overlay dropdown li:first-child {
         justify-content: center;
-        margin: 0 0 1em;
+        margin: 0 0 0.5em;
       }
       overlay dropdown li:last-child {
         justify-content: center;
-        margin: 1em 0 0;
+        margin: 0.5em 0 0;
       }
       overlay dropdown a {
-        color: var(--color-background);
         display: flex;
-        align-items: center;
         flex: 1;
+        align-items: center;
+        color: var(--color-background);
       }
+      overlay dropdown a:focus,
       overlay dropdown a:hover {
         color: var(--color-accent);
       }
       overlay dropdown svg {
         height: 2em;
+        margin-right: var(--card-margin);
+      }
+      overlay dropdown span {
+        white-space: nowrap;
       }
       overlay dropdown update::before {
         content: "last update: ";
@@ -278,8 +291,8 @@
         color: var(--color-info);
       }
       overlay dropdown version {
-        font-weight: bold;
         font-size: 0.85em;
+        font-weight: bold;
       }
       overlay dropdown version::before {
         content: "version: ";
@@ -325,7 +338,7 @@
       }
       shadow {
         position: fixed;
-        z-index: 9999;
+        z-index: 9;
         display: block;
         width: var(--header-padding);
         height: 100rem;
@@ -350,6 +363,7 @@
       }
       noscript {
         position: fixed;
+        z-index: 9999;
         top: 0;
         right: 0;
         bottom: 0;
@@ -357,7 +371,6 @@
         padding: 17rem;
         background: var(--color-danger);
         font-size: 5vmin;
-        z-index: 9999;
         text-align: center;
       }
       screen {
@@ -371,6 +384,11 @@
         animation: screen-out 400ms ease-in forwards;
         background-color: var(--color-background);
         pointer-events: none;
+      }
+      @media (min-aspect-ratio: 2/1) {
+        shadow {
+          display: none;
+        }
       }
       @media (max-aspect-ratio: 4/3) {
         h1 span::before {
@@ -406,7 +424,7 @@
       @keyframes dropdown-in {
         0% {
           opacity: 0;
-          transform: translateX(0) translateY(-1em) scaleX(0) scaleY(0)
+          transform: translateX(0) translateY(-1.5em) scaleX(0) scaleY(0)
             rotate(-60deg);
         }
         40% {
@@ -421,14 +439,14 @@
         }
         100% {
           opacity: 1;
-          transform: translateX(0%) translateY(0%) scaleX(1) scaleY(1)
+          transform: translateX(0) translateY(0) scaleX(1) scaleY(1)
             rotate(0deg);
         }
       }
       @keyframes dropdown-out {
         0% {
           opacity: 1;
-          transform: translateX(0%) translateY(0%) scaleX(1) scaleY(1)
+          transform: translateX(0) translateY(0) scaleX(1) scaleY(1)
             rotate(0deg);
         }
         40% {
@@ -443,7 +461,7 @@
         }
         100% {
           opacity: 0;
-          transform: translateX(0) translateY(-1em) scaleX(0) scaleY(0)
+          transform: translateX(0) translateY(-1.5em) scaleX(0) scaleY(0)
             rotate(-60deg);
         }
       }
@@ -641,7 +659,7 @@
                 </a>
               </li>
               <li>
-                <version>0.7.1</version>
+                <version>0.7.2</version>
               </li>
             </ul>
           </dropdown>

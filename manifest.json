@@ -6,7 +6,7 @@
   "description": "Check circulating supply of Sora ecosystem tokens",
   "theme_color": "#ffffff",
   "background_color": "#51276c",
-  "display": "minimal-ui",
+  "display": "standalone",
   "scope": "/",
   "start_url": "/",
   "categories": ["finance", "utilities", "web3"],
