@@ -88,10 +88,9 @@
         color: var(--color-primary);
         font-size: 1vh;
         user-select: none;
-        overflow-x: scroll;
-        overflow-y: hidden;
       }
       body {
+        overflow-y: hidden;
         display: flex;
         height: 100rem;
         flex-direction: column;
@@ -115,16 +114,15 @@
         font-size: inherit;
         white-space: nowrap;
       }
+      h1 a::before {
+        content: "Sora";
+      }
       h1 a:active,
-      h1 a:focus,
-      h1 a:hover {
+      h1 a:focus {
         color: var(--color-danger);
       }
       h1 span::before {
         content: "quantity monitor";
-      }
-      h1 span:hover::before {
-        color: var(--color-warning);
       }
       h2 {
         z-index: 1;
@@ -141,22 +139,21 @@
         padding: 0 calc(4.5 * var(--card-pixel));
         border: var(--card-border);
         border-radius: 0.5em;
-        margin-left: var(--card-padding);
+        margin-left: 0.5em;
         background: var(--color-primary);
         line-height: 1.5;
       }
       timeframe a {
         display: flex;
-        width: 3.08em;
+        width: 3em;
         align-items: center;
         justify-content: center;
         border-radius: 1em;
-        margin: 0 -0.2em;
+        margin: 0 calc(-4.5 * var(--card-pixel));
         color: var(--color-background);
         font-size: 0.5em;
       }
-      timeframe a:focus,
-      timeframe a:hover {
+      timeframe a:active {
         color: var(--color-success);
       }
       timeframe[data-timeframe="1w"] a:nth-child(1),
@@ -167,9 +164,15 @@
         background-color: var(--color-background);
         color: var(--color-primary);
       }
+      timeframe[data-timeframe="1w"] a:nth-child(1):active,
+      timeframe[data-timeframe="1m"] a:nth-child(2):active,
+      timeframe[data-timeframe="3m"] a:nth-child(3):active,
+      timeframe[data-timeframe="1y"] a:nth-child(4):active {
+        background-color: var(--color-accent);
+      }
       overlay {
         position: relative;
-        margin-left: var(--card-margin);
+        margin-left: 0.5em;
       }
       overlay handle {
         display: flex;
@@ -194,25 +197,19 @@
         font-size: 0.75em;
         transition: transform ease-in-out 300ms;
       }
-      /* overlay:focus-within handle svg, */
-      overlay.focused handle svg {
+      overlay.opened handle svg {
         background-color: var(--color-background);
         color: var(--color-primary);
         transform: rotate(60deg);
       }
-      /* overlay:focus-within handle:active svg, */
-      overlay.focused handle:active svg {
-        background-color: var(--color-background);
+      overlay.opened handle:active svg {
+        background-color: var(--color-accent);
+        color: var(--color-primary);
         filter: brightness(0.8);
       }
-      /* overlay:not(:focus-within) handle:active svg, */
-      overlay:not(.focused) handle:active svg {
+      overlay:not(.opened) handle:active svg {
         color: var(--color-success);
         filter: brightness(0.8);
-      }
-      /* overlay:not(:focus-within) handle:hover svg, */
-      overlay:not(.focused) handle:hover svg {
-        color: var(--color-success);
       }
       overlay dropdown {
         position: absolute;
@@ -220,28 +217,24 @@
         top: 1em;
         right: 0;
         min-width: calc(var(--card-width) - 2 * var(--card-padding));
-        padding-top: var(--card-margin);
+        padding-top: 0.5em;
         margin: 0;
         pointer-events: none;
-        transform: translateX(0%) translateY(-0%) scale(0) rotate(-60deg);
+        transform: translateX(0) translateY(-1.5em) scaleX(0) scaleY(0)
+          rotate(-60deg);
         transform-origin: calc(100% - var(--card-margin))
           calc(2 * var(--card-margin));
       }
-      /* overlay:focus-within dropdown, */
-      overlay.focused dropdown {
-        animation: dropdown-in ease-in-out 300ms forwards;
+      overlay.opened dropdown {
+        animation: dropdown-in ease-out 300ms forwards;
         pointer-events: all;
       }
-      /* overlay:not(:focus-within).reverse dropdown, */
-      overlay:not(.focused).reverse dropdown {
-        animation: dropdown-out ease-in-out 250ms forwards;
+      overlay:not(.opened).closing dropdown {
+        animation: dropdown-out ease-in 250ms forwards;
         pointer-events: none;
       }
       overlay dropdown ul {
         display: flex;
-        min-width: calc(
-          var(--card-width) - 2 * var(--card-margin) - 2 * var(--card-padding)
-        );
         max-width: var(--header-width);
         flex-direction: column;
         padding: var(--card-margin);
@@ -272,8 +265,8 @@
         align-items: center;
         color: var(--color-background);
       }
-      overlay dropdown a:focus,
-      overlay dropdown a:hover {
+      overlay dropdown a:active,
+      overlay dropdown a:focus {
         color: var(--color-accent);
       }
       overlay dropdown svg {
@@ -281,14 +274,11 @@
         margin-right: var(--card-margin);
       }
       overlay dropdown span {
+        margin-right: var(--card-margin);
         white-space: nowrap;
       }
       overlay dropdown update::before {
         content: "last update: ";
-      }
-      overlay dropdown update:hover,
-      overlay dropdown update:hover::before {
-        color: var(--color-info);
       }
       overlay dropdown version {
         font-size: 0.85em;
@@ -317,7 +307,8 @@
         font-weight: bold;
         text-decoration: none;
       }
-      card a.source:hover {
+      card a.source:active,
+      card a.source:focus {
         color: var(--color-danger);
       }
       card:hover a.source {
@@ -385,9 +376,40 @@
         background-color: var(--color-background);
         pointer-events: none;
       }
-      @media (min-aspect-ratio: 2/1) {
-        shadow {
-          display: none;
+      @media (hover: hover) and (pointer: fine) {
+        h1 a:hover {
+          color: var(--color-danger);
+        }
+        h1 span:hover::before {
+          color: var(--color-warning);
+        }
+        timeframe a:focus,
+        timeframe a:hover {
+          color: var(--color-success);
+        }
+        timeframe[data-timeframe="1w"] a:nth-child(1):focus,
+        timeframe[data-timeframe="1m"] a:nth-child(2):focus,
+        timeframe[data-timeframe="3m"] a:nth-child(3):focus,
+        timeframe[data-timeframe="1y"] a:nth-child(4):focus {
+          background-color: var(--color-accent);
+        }
+        overlay.opened handle:focus svg {
+          background-color: var(--color-accent);
+          color: var(--color-primary);
+        }
+        overlay:not(.opened) handle:focus svg,
+        overlay:not(.opened) handle:hover svg {
+          color: var(--color-success);
+        }
+        overlay dropdown a:hover {
+          color: var(--color-accent);
+        }
+        overlay dropdown update:hover,
+        overlay dropdown update:hover::before {
+          color: var(--color-info);
+        }
+        card a.source:hover {
+          color: var(--color-danger);
         }
       }
       @media (max-aspect-ratio: 4/3) {
@@ -421,21 +443,41 @@
           content: "quantity";
         }
       }
+      @media (max-aspect-ratio: 2/3) {
+        h2 {
+          font-size: 0.9em;
+        }
+      }
+      @media (max-aspect-ratio: 1/2) {
+        h1 span::before {
+          content: "quantity";
+        }
+        h2 {
+          font-size: 1em;
+        }
+        overlay dropdown ul {
+          padding: 1em;
+        }
+        overlay dropdown svg,
+        overlay dropdown span {
+          margin-right: 1em;
+        }
+      }
       @keyframes dropdown-in {
         0% {
           opacity: 0;
-          transform: translateX(0) translateY(-1.5em) scaleX(0) scaleY(0)
+          transform: translateX(-0.5em) translateY(-2em) scaleX(0) scaleY(0)
             rotate(-60deg);
         }
         40% {
           opacity: 0.4;
-          transform: translateX(1em) translateY(-0.6em) scaleX(0.1) scaleY(0.1)
-            rotate(-36deg);
+          transform: translateX(0.5em) translateY(-1.2em) scaleX(0.1)
+            scaleY(0.1) rotate(-45deg);
         }
         60% {
           opacity: 0.6;
-          transform: translateX(1em) translateY(-0.4em) scaleX(0.4) scaleY(0.6)
-            rotate(-24deg);
+          transform: translateX(1em) translateY(-0.8em) scaleX(0.4) scaleY(0.6)
+            rotate(-15deg);
         }
         100% {
           opacity: 1;
@@ -451,17 +493,17 @@
         }
         40% {
           opacity: 0.6;
-          transform: translateX(1em) translateY(-0.4em) scaleX(0.4) scaleY(0.6)
-            rotate(-24deg);
+          transform: translateX(1em) translateY(-0.8em) scaleX(0.4) scaleY(0.6)
+            rotate(-15deg);
         }
         60% {
           opacity: 0.4;
-          transform: translateX(1em) translateY(-0.6em) scaleX(0.1) scaleY(0.1)
-            rotate(-36deg);
+          transform: translateX(0.5em) translateY(-1.2em) scaleX(0.1)
+            scaleY(0.1) rotate(-45deg);
         }
         100% {
           opacity: 0;
-          transform: translateX(0) translateY(-1.5em) scaleX(0) scaleY(0)
+          transform: translateX(-0.5em) translateY(-2em) scaleX(0) scaleY(0)
             rotate(-60deg);
         }
       }
@@ -496,19 +538,18 @@
     <header>
       <h1>
         <a href="https://sora.org" target="_blank" title="[visit Sora site]">
-          Sora
         </a>
         <span title="number of coins in circulation (except TBCD)"></span>
       </h1>
       <h2>
         <timeframe data-timeframe="1w">
-          <a id="1w" href="#" title="[select 1 week timeframe]">1W</a>
-          <a id="1m" href="#" title="[select 1 month timeframe]">1M</a>
-          <!-- <a id="3m" href="#" title="[select 3 month timeframe]">3M</a> -->
-          <!-- <a id="1y" href="#" title="[select 1 year timeframe]">1Y</a> -->
+          <a id="1w" href="#" title="[select 1 week]">1W</a>
+          <a id="1m" href="#" title="[select 1 month]">1M</a>
+          <!-- <a id="3m" href="#" title="[select 3 month]">3M</a> -->
+          <!-- <a id="1y" href="#" title="[select 1 year]">1Y</a> -->
         </timeframe>
-        <overlay tabindex="0">
-          <handle title="[open menu]">
+        <overlay>
+          <handle role="button" tabindex="0" title="[open menu]">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               xml:space="preserve"
@@ -520,7 +561,7 @@
               />
             </svg>
           </handle>
-          <dropdown>
+          <dropdown role="menu" aria-hidden="true">
             <ul>
               <li>
                 <update title="alas, non-real time">N/A</update>
@@ -659,7 +700,7 @@
                 </a>
               </li>
               <li>
-                <version>0.7.2</version>
+                <version>0.7.3</version>
               </li>
             </ul>
           </dropdown>

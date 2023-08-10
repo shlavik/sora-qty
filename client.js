@@ -8,14 +8,19 @@ import {
 } from "./utils.js";
 
 const documentEl = document.documentElement;
-const headerEl = document.querySelector("header");
-const timeframeEl = document.querySelector("timeframe");
-const overlayEl = document.querySelector("overlay");
-const updateEl = document.querySelector("update");
-const contentEl = document.querySelector("content");
+const headerEl = documentEl.querySelector("header");
+const timeframeEl = headerEl.querySelector("timeframe");
+const timeframeLinks = timeframeEl.querySelectorAll("a");
+const overlayEl = headerEl.querySelector("overlay");
+const handleEl = overlayEl.querySelector("handle");
+const dropdownEl = overlayEl.querySelector("dropdown");
+const dropdownLinks = dropdownEl.querySelectorAll("a");
+const updateEl = dropdownEl.querySelector("update");
+const contentEl = documentEl.querySelector("content");
 
 function updateRem() {
   setTimeout(() => {
+    documentEl.scrollLeft = 0;
     const size = 0.01 * documentEl.clientHeight;
     const diff = size % 0.1;
     documentEl.style.setProperty("font-size", size - diff + "px");
@@ -30,17 +35,18 @@ function updateHeader(value) {
   headerEl.style.left = Math.round(value) + "px";
 }
 
-function getScrollPercentage() {
+function getScroll() {
   const { clientWidth, scrollLeft, scrollWidth } = documentEl;
   return Math.round((scrollLeft / (scrollWidth - clientWidth)) * 100000000);
 }
 
 const updateLocalStorageScrollDebounced = debounce(
-  () => localStorage.setItem("scroll", getScrollPercentage()),
+  () => localStorage.setItem("scroll", getScroll()),
   100
 );
 
 addEventListener("scroll", () => {
+  closeDropdown();
   updateHeader(documentEl.scrollLeft);
   updateLocalStorageScrollDebounced();
 });
@@ -63,21 +69,65 @@ addEventListener("keydown", ({ key }) => {
   }
 });
 
-overlayEl.addEventListener("mousedown", (event) => event.preventDefault());
-overlayEl.addEventListener("mouseup", () => overlayEl.focus());
-overlayEl.addEventListener("focus", () => {
-  overlayEl.classList.add("focused");
-  overlayEl.classList.remove("reverse");
+function isDropdownOpened() {
+  return overlayEl.classList.contains("opened");
+}
+
+function openDropdown() {
+  overlayEl.classList.add("opened");
+  overlayEl.classList.remove("closing");
+}
+
+function closeDropdown() {
+  if (!isDropdownOpened()) return;
+  overlayEl.classList.remove("opened");
+  overlayEl.classList.add("closing");
+}
+
+function toggleDropdown() {
+  isDropdownOpened() ? closeDropdown() : openDropdown();
+}
+
+documentEl.addEventListener("click", () => {
+  if (isDropdownOpened()) closeDropdown();
 });
-overlayEl.addEventListener("blur", () => {
-  overlayEl.classList.remove("focused");
-  overlayEl.classList.add("reverse");
+
+overlayEl.addEventListener("click", (event) => {
+  event.stopPropagation();
 });
-overlayEl.addEventListener("mouseenter", () => {
-  overlayEl.classList.remove("reverse");
+
+handleEl.addEventListener("click", () => {
+  toggleDropdown();
 });
-overlayEl.addEventListener("mouseleave", () => {
-  overlayEl.classList.contains("focused") && overlayEl.classList.add("reverse");
+
+dropdownEl.addEventListener("animationend", () => {
+  overlayEl.classList.remove("closing");
+});
+
+documentEl.addEventListener("keydown", (event) => {
+  if (event.code === "Escape") {
+    closeDropdown();
+    handleEl.focus();
+    return;
+  }
+  if (event.code === "Tab") {
+    const lastTimeframeLink = timeframeLinks[timeframeLinks.length - 1];
+    const lastDropdownLink = dropdownLinks[dropdownLinks.length - 1];
+    if (event.target === lastTimeframeLink && !event.shiftKey) {
+      openDropdown();
+    } else if (event.target === lastDropdownLink && !event.shiftKey) {
+      closeDropdown();
+    } else if (handleEl.contains(event.target)) {
+      event.shiftKey ? closeDropdown() : openDropdown();
+    }
+  }
+  if (!handleEl.contains(event.target)) return;
+  if (event.code !== "Enter" && event.code !== "Space") return;
+  toggleDropdown();
+});
+
+dropdownLinks[dropdownLinks.length - 1].addEventListener("focus", () => {
+  openDropdown();
 });
 
 let timeframe =
@@ -110,7 +160,8 @@ const links = {};
 fetchTokens().then((value) => {
   tokens.push(
     ...value.filter(
-      (token) => !["busd", "tusd", "frax", "lusd", "husd"].includes(token)
+      (token) =>
+        !["busd", "tusd", "frax", "lusd", "husd", "soshiba"].includes(token)
     )
   );
   createCards();
