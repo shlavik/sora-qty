@@ -7,8 +7,8 @@ import {
   debounce,
 } from "./utils.js";
 
-const documentEl = document.documentElement;
-const headerEl = documentEl.querySelector("header");
+const appEl = document.documentElement.querySelector("app");
+const headerEl = appEl.querySelector("header");
 const timeframeEl = headerEl.querySelector("timeframe");
 const timeframeLinks = timeframeEl.querySelectorAll("a");
 const overlayEl = headerEl.querySelector("overlay");
@@ -16,14 +16,15 @@ const handleEl = overlayEl.querySelector("handle");
 const dropdownEl = overlayEl.querySelector("dropdown");
 const dropdownLinks = dropdownEl.querySelectorAll("a");
 const updateEl = dropdownEl.querySelector("update");
-const contentEl = documentEl.querySelector("content");
+const contentEl = appEl.querySelector("content");
 
 function updateRem() {
   setTimeout(() => {
-    documentEl.scrollLeft = 0;
-    const size = 0.01 * documentEl.clientHeight;
-    const diff = size % 0.1;
-    documentEl.style.setProperty("font-size", size - diff + "px");
+    document.documentElement.style.setProperty(
+      "font-size",
+      0.01 * document.documentElement.clientHeight + "px"
+    );
+    appEl.scrollLeft = 0;
   });
 }
 
@@ -31,41 +32,48 @@ updateRem();
 
 addEventListener("resize", updateRem);
 
-function updateHeader(value) {
-  headerEl.style.left = Math.round(value) + "px";
-}
-
 function getScroll() {
-  const { clientWidth, scrollLeft, scrollWidth } = documentEl;
+  const { clientWidth, scrollLeft, scrollWidth } = appEl;
   return Math.round((scrollLeft / (scrollWidth - clientWidth)) * 100000000);
 }
 
 const updateLocalStorageScrollDebounced = debounce(
   () => localStorage.setItem("scroll", getScroll()),
-  100
+  64
 );
 
-addEventListener("scroll", () => {
+appEl.addEventListener("scroll", () => {
   closeDropdown();
-  updateHeader(documentEl.scrollLeft);
   updateLocalStorageScrollDebounced();
 });
 
 addEventListener("wheel", (event) => {
   const { deltaX, deltaY } = event;
-  documentEl.scrollLeft += deltaX + deltaY;
+  appEl.scrollLeft += Math.abs(deltaX) > Math.abs(deltaY) ? deltaX : 2 * deltaY;
 });
 
-addEventListener("keydown", ({ key }) => {
-  switch (key) {
+addEventListener("keydown", (event) => {
+  switch (event.key) {
+    case "ArrowLeft":
+      event.preventDefault();
+      return (appEl.scrollLeft -= 0.2 * appEl.clientWidth);
+    case "ArrowRight":
+      event.preventDefault();
+      return (appEl.scrollLeft += 0.2 * appEl.clientWidth);
+    case "ArrowUp":
+      event.preventDefault();
+      return (appEl.scrollLeft -= 0.4 * appEl.clientWidth);
+    case "ArrowDown":
+      event.preventDefault();
+      return (appEl.scrollLeft += 0.4 * appEl.clientWidth);
     case "Home":
-      return (documentEl.scrollLeft = 0);
+      return (appEl.scrollLeft = 0);
     case "PageUp":
-      return (documentEl.scrollLeft -= 0.9 * documentEl.clientWidth);
+      return (appEl.scrollLeft -= 0.8 * appEl.clientWidth);
     case "PageDown":
-      return (documentEl.scrollLeft += 0.9 * documentEl.clientWidth);
+      return (appEl.scrollLeft += 0.8 * appEl.clientWidth);
     case "End":
-      return (documentEl.scrollLeft = documentEl.scrollWidth);
+      return (appEl.scrollLeft = appEl.scrollWidth);
   }
 });
 
@@ -88,7 +96,7 @@ function toggleDropdown() {
   isDropdownOpened() ? closeDropdown() : openDropdown();
 }
 
-documentEl.addEventListener("click", () => {
+appEl.addEventListener("click", () => {
   if (isDropdownOpened()) closeDropdown();
 });
 
@@ -104,7 +112,7 @@ dropdownEl.addEventListener("animationend", () => {
   overlayEl.classList.remove("closing");
 });
 
-documentEl.addEventListener("keydown", (event) => {
+addEventListener("keydown", (event) => {
   if (event.code === "Escape") {
     closeDropdown();
     handleEl.focus();
@@ -196,28 +204,18 @@ function createCard(token) {
   });
 }
 
-function updateHeaderTransition() {
-  setTimeout(
-    () =>
-      (headerEl.style.transition =
-        "width ease-in-out 600ms 200ms, left ease-in-out 600ms 200ms")
-  );
-}
-
 function createCards() {
   if (!tokens || tokens.length < 1) return;
   contentEl.className = timeframe;
   tokens.forEach(createCard);
   const scroll = Number(localStorage.getItem("scroll")) || 0;
-  if (scroll === 0) return updateHeaderTransition();
-  const { clientWidth, scrollWidth } = documentEl;
+  if (scroll === 0) return;
+  const { clientWidth, scrollWidth } = appEl;
   setTimeout(() => {
     const scrollLeft = Math.round(
       ((scrollWidth - clientWidth) * scroll) / 100000000
     );
-    documentEl.scrollLeft = scrollLeft;
-    updateHeader(scrollLeft);
-    updateHeaderTransition();
+    appEl.scrollLeft = scrollLeft;
   });
 }
 
