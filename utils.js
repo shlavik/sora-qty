@@ -395,7 +395,10 @@ export function getMousePos(canvas, event) {
 }
 
 export function addSeparator(text) {
-  return new Intl.NumberFormat("en-US").format(text);
+  return new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 6,
+  }).format(text);
 }
 
 export function addDays(dirtyDate, amount) {
@@ -434,6 +437,10 @@ export function formatDateString(timestamp) {
   );
 }
 
+export function formatValue(value) {
+  return value >= 100 ? Math.round(value) : value;
+}
+
 export function cutData(data = [], start = 0) {
   const index = data.findIndex(([t]) => t >= start);
   if (index <= 0) return data;
@@ -443,7 +450,7 @@ export function cutData(data = [], start = 0) {
   const [nextTime, nextValue] = data[index];
   const ratio = (start - prevTime) / (nextTime - prevTime);
   let value = prevValue + ratio * (nextValue - prevValue);
-  value = Math.round(value);
+  value = formatValue(value);
   slice.unshift([start, value]);
   return slice;
 }

@@ -31,17 +31,25 @@ grab().then((grabbed) => {
   });
 });
 
+function parseValue(str) {
+  const int = parseInt(str);
+  if (int >= 100) return int;
+  const float = parseFloat(str);
+  if (Number.isNaN(float)) return NaN;
+  return parseFloat(float.toFixed(8));
+}
+
 function grab() {
   return Promise.allSettled(
     tokens.map((token) =>
       fetch(baseUrl + token)
         .then((response) => response.text())
-        .then((text) => [token, parseInt(text)])
+        .then((text) => [token, parseValue(text)])
     )
   ).then((result) =>
     result
       .filter(({ status }) => status === "fulfilled")
       .map(({ value }) => value)
-      .filter(([_, value]) => value)
+      .filter(([_, value]) => value >= 0)
   );
 }

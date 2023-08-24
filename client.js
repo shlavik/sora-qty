@@ -2,8 +2,9 @@ import {
   drawCard,
   drawCross,
   drawValue,
-  getMousePos,
   formatDateString,
+  formatValue,
+  getMousePos,
   debounce,
 } from "./utils.js";
 
@@ -190,7 +191,7 @@ function createCard(token) {
   link.href = "https://mof.sora.org/qty/" + token;
   link.target = "_blank";
   link.title = "[view source]";
-  link.innerText = token;
+  link.innerText = token.toUpperCase();
   const container = document.createElement("card");
   container.appendChild(canvas);
   container.appendChild(link);
@@ -247,7 +248,8 @@ function updateOverlay(token) {
       let ratio = (x - leftX) / (rightX - leftX);
       if (ratio < 0) ratio = 0;
       if (ratio > 1) ratio = 1;
-      const value = Math.round(leftValue + ratio * (rightValue - leftValue));
+      let value = leftValue + ratio * (rightValue - leftValue);
+      value = formatValue(value);
       let crossX = x;
       if (x < points[0][0]) {
         crossX = points[0][0];
@@ -359,11 +361,11 @@ function drawOverlay({
   token,
   canvas = canvases[token],
   context = canvas.getContext("2d"),
-  value = 0,
+  value,
   cross = [],
   timestamp = 0,
 }) {
-  if (value) drawValue(context, [180, 144], value);
+  if (value >= 0) drawValue(context, [180, 144], value);
   drawCross(context, cross);
   if (!timestamp) return;
   const link = links[token];
