@@ -397,7 +397,7 @@ export function getMousePos(canvas, event) {
 export function addSeparator(text) {
   return new Intl.NumberFormat("en-US", {
     minimumFractionDigits: 0,
-    maximumFractionDigits: 6,
+    maximumFractionDigits: 3,
   }).format(text);
 }
 

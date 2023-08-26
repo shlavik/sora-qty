@@ -36,7 +36,7 @@ function parseValue(str) {
   if (int >= 100) return int;
   const float = parseFloat(str);
   if (Number.isNaN(float)) return NaN;
-  return parseFloat(float.toFixed(8));
+  return Math.trunc(100_000 * float) / 100_000;
 }
 
 function grab() {
