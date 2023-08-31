@@ -253,6 +253,7 @@ export function drawToken(ctx, [x, y], token) {
     4: 56,
     5: 48,
     6: 44,
+    7: 38,
   }[token.length];
   drawText(ctx, [x, y - 24 / size], {
     text: token.toUpperCase(),

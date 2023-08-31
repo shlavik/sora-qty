@@ -32,11 +32,10 @@ grab().then((grabbed) => {
 });
 
 function parseValue(str) {
-  const int = parseInt(str);
-  if (int >= 100) return int;
   const float = parseFloat(str);
   if (Number.isNaN(float)) return NaN;
-  return Math.trunc(100_000 * float) / 100_000;
+  const round = Math.round(100_000 * float) / 100_000;
+  return round < 100 ? round : Math.trunc(round);
 }
 
 function grab() {

@@ -50,7 +50,7 @@ appEl.addEventListener("scroll", () => {
 
 addEventListener("wheel", (event) => {
   const { deltaX, deltaY } = event;
-  appEl.scrollLeft += Math.abs(deltaX) > Math.abs(deltaY) ? deltaX : 2 * deltaY;
+  appEl.scrollLeft += deltaX + 2 * deltaY;
 });
 
 addEventListener("keydown", (event) => {
