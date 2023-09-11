@@ -3,7 +3,6 @@ import {
   drawCross,
   drawValue,
   formatDateString,
-  formatValue,
   getMousePos,
   debounce,
 } from "./utils.js";
@@ -166,13 +165,20 @@ const pointsset = {};
 const underlays = {};
 const links = {};
 
+const hiddenTokens = [
+  "ceres",
+  "deo",
+  "hmx",
+  "busd",
+  "tusd",
+  "frax",
+  "lusd",
+  "husd",
+  "soshiba",
+];
+
 fetchTokens().then((value) => {
-  tokens.push(
-    ...value.filter(
-      (token) =>
-        !["busd", "tusd", "frax", "lusd", "husd", "soshiba"].includes(token)
-    )
-  );
+  tokens.push(...value.filter((token) => !hiddenTokens.includes(token)));
   createCards();
   checkTimestamp();
   setInterval(() => checkTimestamp(), 10000);
@@ -220,6 +226,55 @@ function createCards() {
   });
 }
 
+function isPeak(index, array) {
+  const prev = array[index - 1] ? array[index - 1][1] : null;
+  const cur = array[index] ? array[index][1] : null;
+  const next = array[index + 1] ? array[index + 1][1] : null;
+  return (cur > prev && cur > next) || (cur < prev && cur < next);
+}
+
+function findNearestPeak(index, array, timeRange) {
+  const currentTime = array[index][0];
+  let nearestPeakIndex = null;
+  let nearestPeakTimeDiff = Number.MAX_SAFE_INTEGER;
+  for (let i = 1; i < array.length; i++) {
+    for (const direction of [-1, 1]) {
+      const targetIndex = index + i * direction;
+      if (targetIndex <= 0 || targetIndex >= array.length) continue;
+      const [time] = array[targetIndex];
+      const timeDiff = Math.abs(currentTime - time);
+      if (timeDiff > timeRange) continue;
+      if (isPeak(targetIndex, array) && timeDiff < nearestPeakTimeDiff) {
+        nearestPeakIndex = targetIndex;
+        nearestPeakTimeDiff = timeDiff;
+      }
+    }
+    if (nearestPeakIndex !== null) break;
+  }
+  return nearestPeakIndex;
+}
+
+function findIndexes(points = [], x = 0) {
+  if (points.length === 0) return [-1, -1];
+  const lastIndex = points.length - 1;
+  let low = 0;
+  let high = lastIndex;
+  while (low <= high) {
+    const index = (low + high) >>> 1;
+    const value = points[index][0];
+    if (value < x) {
+      low = index + 1;
+    } else if (value > x) {
+      high = index - 1;
+    } else {
+      return [index, index];
+    }
+  }
+  if (low < 1) return [0, 0];
+  if (low > lastIndex) return [lastIndex, lastIndex];
+  return [low - 1, low];
+}
+
 function updateOverlay(token) {
   const canvas = canvases[token];
   const context = canvas.getContext("2d");
@@ -245,42 +300,38 @@ function updateOverlay(token) {
       const [rightTime, rightValue] = cutted[right];
       const [leftX, leftY] = points[left];
       const [rightX, rightY] = points[right];
-      let ratio = (x - leftX) / (rightX - leftX);
-      if (ratio < 0) ratio = 0;
-      if (ratio > 1) ratio = 1;
-      let value = leftValue + ratio * (rightValue - leftValue);
-      value = formatValue(value);
-      let crossX = x;
-      if (x < points[0][0]) {
-        crossX = points[0][0];
+      let value, crossX, crossY, timestamp;
+      const timeRange =
+        {
+          "1w": 30 * 60 * 1000,
+          "1m": 150 * 60 * 1000,
+        }[timeframe] || 0;
+      const nearestPeakIndex = findNearestPeak(left, cutted, timeRange);
+      if (nearestPeakIndex !== null) {
+        const [peakTime, peakValue] = cutted[nearestPeakIndex];
+        const [peakX, peakY] = points[nearestPeakIndex];
+        value = peakValue;
+        crossX = peakX;
+        crossY = peakY;
+        timestamp = peakTime;
+      } else {
+        let ratio = (x - leftX) / (rightX - leftX);
+        if (ratio < 0) ratio = 0;
+        if (ratio > 1) ratio = 1;
+        value = leftValue + ratio * (rightValue - leftValue);
+        crossX = x;
+        if (x < points[0][0]) {
+          crossX = points[0][0];
+        }
+        if (x > points[points.length - 1][0]) {
+          crossX = points[points.length - 1][0];
+        }
+        crossY = leftY + ratio * (rightY - leftY);
+        timestamp = leftTime + ratio * (rightTime - leftTime);
       }
-      if (x > points[points.length - 1][0]) {
-        crossX = points[points.length - 1][0];
-      }
-      const crossY = leftY + ratio * (rightY - leftY);
-      const cross = [crossX, crossY];
-      const timestamp = leftTime + ratio * (rightTime - leftTime);
-      drawOverlay({ token, value, cross, timestamp });
+      drawOverlay({ token, value, cross: [crossX, crossY], timestamp });
     });
   };
-}
-
-function findIndexes(points = [], x = 0) {
-  const lastIndex = points.length - 1;
-  let low = 0;
-  let high = points.length - 1;
-  while (low <= high) {
-    const index = (low + high) >>> 1;
-    const item = points[index];
-    if (item === undefined) return [lastIndex, lastIndex];
-    const value = item[0];
-    if (value < x) low = index + 1;
-    else if (value > x) high = index - 1;
-    else return [index, index];
-  }
-  if (low < 1) return [0, 0];
-  if (low > lastIndex) return [lastIndex, lastIndex];
-  return [low - 1, low];
 }
 
 function resetOverlay(token) {

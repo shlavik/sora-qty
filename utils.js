@@ -99,7 +99,7 @@ export function drawCross(ctx, [x, y]) {
   drawPolyline(ctx, dash3);
   drawPolyline(ctx, dash4);
   ctx.strokeStyle = "red";
-  ctx.lineWidth = 3;
+  ctx.lineWidth = 3.5;
   drawPolyline(ctx, dash1);
   drawPolyline(ctx, dash2);
   drawPolyline(ctx, dash3);
@@ -140,9 +140,8 @@ export function drawRuler(
     x = denoFix(x, month, date);
     const opts = { color, size: 14, restrict: 38 };
     if (timeframe === "1w") {
-      const text = month + "." + date;
-      drawText(ctx, [x, y1 + 7], { ...opts, text });
-      drawText(ctx, [x, y2 - 5], { ...opts, text });
+      drawText(ctx, [x, y1 + 7], { ...opts, text: month + "." + date });
+      drawText(ctx, [x, y2 - 5], { ...opts, text: date + "." + month });
     } else {
       drawText(ctx, [x, y1 + 7], { ...opts, text: month });
       drawText(ctx, [x, y2 - 5], { ...opts, text: month });
@@ -264,7 +263,7 @@ export function drawToken(ctx, [x, y], token) {
 
 export function drawValue(ctx, [x, y], value = 0) {
   drawText(ctx, [x, y || 144], {
-    text: addSeparator(value),
+    text: addSeparator(formatValue(value)),
     gradient: true,
     size: 36,
   });
