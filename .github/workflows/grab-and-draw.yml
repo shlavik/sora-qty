@@ -11,7 +11,7 @@ jobs:
           fetch-depth: 2
       - uses: denoland/setup-deno@v1
         with:
-          deno-version: "1.36.3"
+          deno-version: "1.37.0"
       - run: ./grab.sh
       - run: ./render.sh
         continue-on-error: true

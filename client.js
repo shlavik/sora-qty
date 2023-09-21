@@ -1,11 +1,35 @@
 import {
+  cardHeight,
+  cardWidth,
+  debounce,
   drawCard,
   drawCross,
   drawValue,
   formatDateString,
   getMousePos,
-  debounce,
-} from "./utils.js";
+  separate,
+} from "./core.js";
+
+const tokens = [];
+const synths = [];
+const dataset = {};
+const canvasEls = {};
+const icons = {};
+const cuttedset = {};
+const pointsset = {};
+const underlays = {};
+const links = {};
+
+const hiddenTokens = [
+  "ceres",
+  "deo",
+  "hmx",
+  "busd",
+  "tusd",
+  "frax",
+  "lusd",
+  "husd",
+];
 
 const appEl = document.documentElement.querySelector("app");
 const headerEl = appEl.querySelector("header");
@@ -16,7 +40,8 @@ const handleEl = overlayEl.querySelector("handle");
 const dropdownEl = overlayEl.querySelector("dropdown");
 const dropdownLinks = dropdownEl.querySelectorAll("a");
 const updateEl = dropdownEl.querySelector("update");
-const contentEl = appEl.querySelector("content");
+const tokensEl = appEl.querySelector("tokens");
+const synthsEl = appEl.querySelector("synths");
 
 function updateRem() {
   setTimeout(() => {
@@ -142,9 +167,8 @@ let timeframe =
   {
     "1w": "1w",
     "1m": "1m",
-    "3m": "3m",
     "1y": "1y",
-  }[localStorage.getItem("timeframe")] || "1w";
+  }[localStorage.getItem("timeframe")] || "1m";
 timeframeEl.dataset.timeframe = timeframe;
 
 timeframeEl.addEventListener("click", (event) => {
@@ -154,67 +178,59 @@ timeframeEl.addEventListener("click", (event) => {
   timeframeEl.dataset.timeframe = timeframe;
   localStorage.setItem("timeframe", timeframe);
   tokens.forEach((token) => drawUnderlay({ token }).then(drawOverlay));
+  synths.forEach((token) => drawUnderlay({ token }).then(drawOverlay));
 });
 
-const tokens = [];
-const dataset = {};
-const canvases = {};
-const icons = {};
-const cuttedset = {};
-const pointsset = {};
-const underlays = {};
-const links = {};
-
-const hiddenTokens = [
-  "ceres",
-  "deo",
-  "hmx",
-  "busd",
-  "tusd",
-  "frax",
-  "lusd",
-  "husd",
-  "soshiba",
-];
-
 fetchTokens().then((value) => {
-  tokens.push(...value.filter((token) => !hiddenTokens.includes(token)));
+  const filtered = value.filter((token) => !hiddenTokens.includes(token));
+  const [xst, rest] = separate(filtered, (token) =>
+    (token || "").startsWith("xst")
+  );
+  const difflength = xst.length - rest.length;
+  tokens.push(
+    ...rest,
+    ...xst.splice(xst.length - difflength, Math.ceil(difflength / 2))
+  );
+  synths.push(...xst);
   createCards();
   checkTimestamp();
   setInterval(() => checkTimestamp(), 10000);
 });
 
-function createCard(token) {
-  const canvas = document.createElement("canvas");
-  canvases[token] = canvas;
-  canvas.width = 360;
-  canvas.height = 630;
-  canvas.addEventListener("mousemove", updateOverlay(token), false);
-  canvas.addEventListener("mouseleave", resetOverlay(token), false);
-  const link = document.createElement("a");
-  links[token] = link;
-  link.className = "source";
-  link.href = "https://mof.sora.org/qty/" + token;
-  link.target = "_blank";
-  link.title = "[view source]";
-  link.innerText = token.toUpperCase();
-  const container = document.createElement("card");
-  container.appendChild(canvas);
-  container.appendChild(link);
-  contentEl.appendChild(container);
-  const icon = document.createElement("img");
-  icons[token] = icon;
-  icon.src = "./images/icons/" + token + ".png";
-  icon.addEventListener("load", () => {
-    drawUnderlay({ token });
-    fetchData(token).then(drawUnderlay).then(drawOverlay);
-  });
+function createCard(parentEl) {
+  return (token) => {
+    const canvasEl = document.createElement("canvas");
+    canvasEls[token] = canvasEl;
+    canvasEl.width = cardWidth;
+    canvasEl.height = cardHeight;
+    canvasEl.addEventListener("mousemove", updateOverlay(token), false);
+    canvasEl.addEventListener("mouseleave", resetOverlay(token), false);
+    const link = document.createElement("a");
+    links[token] = link;
+    link.className = "source";
+    link.href = "https://mof.sora.org/qty/" + token;
+    link.target = "_blank";
+    link.title = "[check source]";
+    link.innerText = token.toUpperCase();
+    const card = document.createElement("card");
+    card.appendChild(canvasEl);
+    card.appendChild(link);
+    parentEl.appendChild(card);
+    const icon = document.createElement("img");
+    icons[token] = icon;
+    icon.src = "./images/icons/" + token + ".png";
+    icon.addEventListener("load", () => {
+      drawUnderlay({ token });
+      fetchData(token).then(drawUnderlay).then(drawOverlay);
+    });
+  };
 }
 
 function createCards() {
   if (!tokens || tokens.length < 1) return;
-  contentEl.className = timeframe;
-  tokens.forEach(createCard);
+  tokensEl.className = timeframe;
+  tokens.forEach(createCard(tokensEl));
+  synths.forEach(createCard(synthsEl));
   const scroll = Number(localStorage.getItem("scroll")) || 0;
   if (scroll === 0) return;
   const { clientWidth, scrollWidth } = appEl;
@@ -276,8 +292,8 @@ function findIndexes(points = [], x = 0) {
 }
 
 function updateOverlay(token) {
-  const canvas = canvases[token];
-  const context = canvas.getContext("2d");
+  const canvasEl = canvasEls[token];
+  const context = canvasEl.getContext("2d");
   let timeout;
   return (event) => {
     if (timeout) cancelAnimationFrame(timeout);
@@ -286,8 +302,8 @@ function updateOverlay(token) {
       const cutted = cuttedset[token] || [];
       const points = pointsset[token] || [];
       if (cutted.length < 1 || points.length < 1) return;
-      const { x, y } = getMousePos(canvas, event);
-      if (x < 0 || y < 228 || x > 360 || y > 556) {
+      const { x, y } = getMousePos(canvasEl, event);
+      if (x < 0 || y < 100 || x > 360 || y > 285) {
         return drawOverlay({
           token,
           value: cutted[cutted.length - 1][1] || 0,
@@ -305,6 +321,7 @@ function updateOverlay(token) {
         {
           "1w": 30 * 60 * 1000,
           "1m": 150 * 60 * 1000,
+          "1y": 300 * 60 * 1000,
         }[timeframe] || 0;
       const nearestPeakIndex = findNearestPeak(left, cutted, timeRange);
       if (nearestPeakIndex !== null) {
@@ -378,17 +395,17 @@ function fetchData(token) {
 }
 
 async function drawUnderlay({ token, data = dataset[token] } = {}) {
-  const canvas = canvases[token];
+  const canvas = canvasEls[token];
   const context = canvas.getContext("2d", { willReadFrequently: true });
   const icon = icons[token];
-  const { cutted, points } = drawCard(
-    context,
-    [
-      [0, 0],
-      [canvas.width, canvas.height],
-    ],
-    { token, data, icon, timeframe, crossVisible: false, valueVisible: false }
-  );
+  const { cutted, points } = drawCard(context, {
+    token,
+    data,
+    icon,
+    timeframe,
+    crossVisible: false,
+    valueVisible: false,
+  });
   cuttedset[token] = cutted;
   pointsset[token] = points;
   underlays[token] = context.getImageData(0, 0, canvas.width, canvas.height);
@@ -410,13 +427,13 @@ async function drawUnderlay({ token, data = dataset[token] } = {}) {
 
 function drawOverlay({
   token,
-  canvas = canvases[token],
+  canvas = canvasEls[token],
   context = canvas.getContext("2d"),
   value,
   cross = [],
   timestamp = 0,
 }) {
-  if (value >= 0) drawValue(context, [180, 144], value);
+  if (value >= 0) drawValue(context, [180, 195], value);
   drawCross(context, cross);
   if (!timestamp) return;
   const link = links[token];

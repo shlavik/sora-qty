@@ -1,4 +1,4 @@
-import { subDays, cutData } from "./utils.js";
+import { cutData, formatValue } from "./core.js";
 
 import tokens from "./tokens.json" assert { type: "json" };
 
@@ -16,10 +16,9 @@ grab().then((grabbed) => {
   );
   const write = (token) => (data) => {
     Deno.writeTextFile("./data/" + token + ".json", JSON.stringify(data));
-    const monthly = cutData(data, subDays(now, 33).valueOf());
     Deno.writeTextFile(
       "./data/monthly/" + token + ".json",
-      JSON.stringify(monthly)
+      JSON.stringify(data)
     );
   };
   grabbed.forEach(([token, qty]) => {

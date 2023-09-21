@@ -4,7 +4,28 @@ import {
   Image,
 } from "https://deno.land/x/skia_canvas@0.5.4/mod.ts";
 
-import { registerDrawImage, drawCard, drawPreview } from "./utils.js";
+import {
+  cardHeight,
+  cardWidth,
+  colorBackground,
+  drawCard,
+  drawImage,
+  drawRect,
+  registerCreateCanvas,
+  registerDrawImage,
+} from "./core.js";
+
+registerCreateCanvas((cardWidth, cardHeight) =>
+  createCanvas(cardWidth, cardHeight)
+);
+
+registerDrawImage((ctx, [x, y], { img, width, height }) => {
+  ctx.drawImage(new Image(img), x, y, width, height);
+});
+
+const fontPath = "./fonts/Sora-SemiBold.ttf";
+const fontFile = Deno.readFileSync(fontPath);
+Fonts.register(fontFile, "sora");
 
 const tokens = ["xor", "val", "pswap", "tbcd", "xst", "xstusd"];
 
@@ -18,15 +39,6 @@ const dataset = Object.fromEntries(
     )
   )
 );
-
-const fontPath = "./fonts/Sora-SemiBold.ttf";
-const fontFile = Deno.readFileSync(fontPath);
-Fonts.register(fontFile, "sora");
-
-registerDrawImage((ctx, [x, y], path) => {
-  const img = new Image(path);
-  ctx.drawImage(img, x, y);
-});
 
 (function renderReadme() {
   const header = "# [Sora quantity monitor](https://sora-qty.info)\n\n";
@@ -47,20 +59,13 @@ registerDrawImage((ctx, [x, y], path) => {
 tokens.forEach(renderCard);
 
 function renderCard(token) {
-  const canvas = createCanvas(360, 630);
+  const canvas = createCanvas(cardWidth, cardHeight);
   const context = canvas.getContext("2d");
-  drawCard(
-    context,
-    [
-      [0, 0],
-      [canvas.width, canvas.height],
-    ],
-    {
-      token,
-      data: dataset[token],
-      icon: "./images/icons/" + token + ".png",
-    }
-  );
+  drawCard(context, {
+    token,
+    data: dataset[token],
+    icon: "./images/icons/" + token + ".png",
+  });
   canvas.save("./images/" + token + ".png");
 }
 
@@ -74,27 +79,31 @@ function renderCard(token) {
       [canvas.width, canvas.height],
     ],
     {
-      tokens:
-        Math.random() < 0.5
-          ? ["xor", "val", "pswap"]
-          : ["xor", "xst", "xstusd"],
+      tokens: [
+        ["xor", "val", "pswap"],
+        ["tbcd", "xst", "xstusd"],
+      ],
     }
   );
   canvas.save("./images/preview.png");
 })();
 
-["weekly", "monthly"].forEach(renderPlaceholder);
-
-function renderPlaceholder(timeframe) {
-  const canvas = createCanvas(360, 630);
-  const context = canvas.getContext("2d");
-  drawCard(
-    context,
+function drawPreview(ctx, [[x1, y1], [x2, y2]], { tokens = [] } = {}) {
+  drawRect(
+    ctx,
     [
-      [0, 0],
-      [canvas.width, canvas.height],
+      [x1, y1],
+      [x2, y2],
     ],
-    { timeframe }
+    {
+      fill: colorBackground,
+    }
   );
-  canvas.save("./images/placeholder_" + timeframe + ".png");
+  for (const [i, row] of Object.entries(tokens)) {
+    for (const [j, token] of Object.entries(row)) {
+      drawImage(ctx, [30 + j * (cardWidth + 30), Number(i) ? cardHeight : 0], {
+        img: "./images/" + token + ".png",
+      });
+    }
+  }
 }
