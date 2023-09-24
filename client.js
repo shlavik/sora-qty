@@ -29,6 +29,7 @@ const hiddenTokens = [
   "frax",
   "lusd",
   "husd",
+  "soshiba"
 ];
 
 const appEl = document.documentElement.querySelector("app");
@@ -186,6 +187,7 @@ fetchTokens().then((value) => {
   const [xst, rest] = separate(filtered, (token) =>
     (token || "").startsWith("xst")
   );
+  if (filtered.length % 2 !== 0) rest.push("soshiba")
   const difflength = xst.length - rest.length;
   tokens.push(
     ...rest,
@@ -227,7 +229,6 @@ function createCard(parentEl) {
 }
 
 function createCards() {
-  if (!tokens || tokens.length < 1) return;
   tokensEl.className = timeframe;
   tokens.forEach(createCard(tokensEl));
   synths.forEach(createCard(synthsEl));
@@ -369,13 +370,13 @@ function checkTimestamp() {
   fetch("./timestamp.json", { cache: "reload" })
     .then((response) => response.text())
     .then(JSON.parse)
-    .catch(() => {})
+    .catch(() => { })
     .then((timestamp) => {
       updateEl.innerText = timestamp
         ? Math.round((Date.now() - timestamp) / 60000) + "m ago"
         : "N/A";
       if (!timestamp || timestamp === checkTimestamp.timestamp) return;
-      if (checkTimestamp.timestamp && tokens) {
+      if (checkTimestamp.timestamp && tokens.length > 0) {
         tokens.forEach((token) => {
           fetchData(token).then(drawUnderlay).then(drawOverlay);
         });

@@ -42,7 +42,7 @@ export function drawCard(
       height: iconSize,
     });
   }
-  if (token) drawToken(ctx, [cardWidth - 48, 62], token);
+  if (token) drawToken(ctx, [cardWidth - iconSize, 62], token);
   return drawDetails(
     ctx,
     [
