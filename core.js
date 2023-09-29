@@ -494,19 +494,6 @@ export function endOfDay(dirtyDate) {
   return date;
 }
 
-export function formatDateString(timestamp) {
-  const formatZero = (value) => (value < 10 ? "0" + value : value.toString());
-  const time = new Date(timestamp);
-  const year = time.getFullYear();
-  const month = formatZero(time.getMonth() + 1);
-  const date = formatZero(time.getDate());
-  const hour = formatZero(time.getHours());
-  const minutes = formatZero(time.getMinutes());
-  return (
-    "[ " + year + "." + month + "." + date + " | " + hour + ":" + minutes + " ]"
-  );
-}
-
 export function debounce(func, delay) {
   let timer;
   return (...args) => {

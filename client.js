@@ -5,7 +5,6 @@ import {
   drawCard,
   drawCross,
   drawValue,
-  formatDateString,
   getMousePos,
   separate,
 } from "./core.js";
@@ -18,7 +17,7 @@ const icons = {};
 const cuttedset = {};
 const pointsset = {};
 const underlays = {};
-const links = {};
+const linkEls = {};
 
 const hiddenTokens = [
   "ceres",
@@ -178,8 +177,8 @@ timeframeEl.addEventListener("click", (event) => {
   timeframe = event.target.id;
   timeframeEl.dataset.timeframe = timeframe;
   localStorage.setItem("timeframe", timeframe);
-  tokens.forEach((token) => drawUnderlay({ token }).then(drawOverlay));
-  synths.forEach((token) => drawUnderlay({ token }).then(drawOverlay));
+  tokens.forEach(resetLays);
+  synths.forEach(resetLays);
 });
 
 fetchTokens().then((value) => {
@@ -191,7 +190,7 @@ fetchTokens().then((value) => {
   const difflength = xst.length - rest.length;
   tokens.push(
     ...rest,
-    ...xst.splice(xst.length - difflength, Math.ceil(difflength / 2))
+    ...xst.splice(xst.length - Math.floor(difflength / 2), xst.length - 1).reverse()
   );
   synths.push(...xst);
   createCards();
@@ -205,10 +204,11 @@ function createCard(parentEl) {
     canvasEls[token] = canvasEl;
     canvasEl.width = cardWidth;
     canvasEl.height = cardHeight;
-    canvasEl.addEventListener("mousemove", updateOverlay(token), false);
-    canvasEl.addEventListener("mouseleave", resetOverlay(token), false);
+    canvasEl.addEventListener("mousemove", createUpdateOverlay(token), false);
+    canvasEl.addEventListener("mouseleave", () => resetLays(token), false);
+    drawUnderlay(token);
     const link = document.createElement("a");
-    links[token] = link;
+    linkEls[token] = link;
     link.className = "source";
     link.href = "https://mof.sora.org/qty/" + token;
     link.target = "_blank";
@@ -221,10 +221,8 @@ function createCard(parentEl) {
     const icon = document.createElement("img");
     icons[token] = icon;
     icon.src = "./images/icons/" + token + ".png";
-    icon.addEventListener("load", () => {
-      drawUnderlay({ token });
-      fetchData(token).then(drawUnderlay).then(drawOverlay);
-    });
+    icon.addEventListener("load", () => resetLays(token));
+    fetchData(token).then(resetLays)
   };
 }
 
@@ -292,7 +290,7 @@ function findIndexes(points = [], x = 0) {
   return [low - 1, low];
 }
 
-function updateOverlay(token) {
+function createUpdateOverlay(token) {
   const canvasEl = canvasEls[token];
   const context = canvasEl.getContext("2d");
   let timeout;
@@ -352,10 +350,6 @@ function updateOverlay(token) {
   };
 }
 
-function resetOverlay(token) {
-  return () => drawUnderlay({ token }).then(drawOverlay);
-}
-
 function fetchTokens() {
   return fetch("./tokens.json", { cache: "reload" })
     .then((response) => response.text())
@@ -377,9 +371,7 @@ function checkTimestamp() {
         : "N/A";
       if (!timestamp || timestamp === checkTimestamp.timestamp) return;
       if (checkTimestamp.timestamp && tokens.length > 0) {
-        tokens.forEach((token) => {
-          fetchData(token).then(drawUnderlay).then(drawOverlay);
-        });
+        tokens.forEach((token) => fetchData(token).then(resetLays));
       }
       checkTimestamp.timestamp = timestamp;
     });
@@ -392,10 +384,16 @@ function fetchData(token) {
     .then((response) => response.text())
     .then(JSON.parse)
     .catch(() => [])
-    .then((data) => ((dataset[token] = data), { token, data }));
+    .then((data) => ((dataset[token] = data), token))
 }
 
-async function drawUnderlay({ token, data = dataset[token] } = {}) {
+async function resetLays(token) {
+  return drawUnderlay(token).then(drawOverlay);
+}
+
+async function drawUnderlay(token) {
+  if (!token) return;
+  const data = dataset[token];
   const canvas = canvasEls[token];
   const context = canvas.getContext("2d", { willReadFrequently: true });
   const icon = icons[token];
@@ -426,6 +424,17 @@ async function drawUnderlay({ token, data = dataset[token] } = {}) {
   };
 }
 
+function drawLink(linkEl, timestamp) {
+  const formatZero = (value) => (value < 10 ? "0" + value : value.toString());
+  const time = new Date(timestamp);
+  const year = time.getFullYear();
+  const month = formatZero(time.getMonth() + 1);
+  const date = formatZero(time.getDate());
+  const hour = formatZero(time.getHours());
+  const minutes = formatZero(time.getMinutes());
+  linkEl.innerHTML = "[ <span>" + year + "." + month + "." + date + "</span> | <span>" + hour + ":" + minutes + "</span> ]";
+}
+
 function drawOverlay({
   token,
   canvas = canvasEls[token],
@@ -436,7 +445,5 @@ function drawOverlay({
 }) {
   if (value >= 0) drawValue(context, [180, 195], value);
   drawCross(context, cross);
-  if (!timestamp) return;
-  const link = links[token];
-  link.innerText = formatDateString(timestamp);
+  if (timestamp) drawLink(linkEls[token], timestamp);
 }

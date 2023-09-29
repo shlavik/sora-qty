@@ -107,7 +107,7 @@
       }
       header {
         position: sticky;
-        z-index: 1;
+        z-index: 3;
         right: 0;
         left: 0;
         display: flex;
@@ -301,7 +301,7 @@
         right: 0;
         bottom: 2rem;
         left: 0;
-        animation: screen-out 600ms ease-in forwards;
+        animation: screen-out 800ms ease-in forwards;
         box-shadow: inset 0 0 var(--card-gap) var(--card-gap)
           var(--color-background);
         pointer-events: none;
@@ -319,8 +319,10 @@
         justify-content: center;
         margin: 0 var(--card-margin);
       }
-      card a.source {
+      card:hover {
         z-index: 2;
+      }
+      card a.source {
         position: absolute;
         bottom: -0.25rem;
         display: none;
@@ -328,15 +330,18 @@
         font-size: 2rem;
         font-weight: bold;
         text-decoration: none;
-        text-shadow: 0 0 0.02em var(--color-secondary);
+        text-shadow: 0 0 0.1em var(--color-secondary);
       }
       card a.source:active,
       card a.source:focus {
         color: var(--color-danger);
-        text-shadow: 0 0 0.02em var(--color-danger);
+        text-shadow: none;
       }
       card:hover a.source {
         display: inline;
+      }
+      card a.source span {
+        color: var(--color-danger);
       }
       canvas {
         width: var(--card-width);
@@ -390,7 +395,7 @@
         }
         card a.source:hover {
           color: var(--color-danger);
-          text-shadow: 0 0 0.02em var(--color-danger);
+          text-shadow: none;
         }
       }
       @media (max-aspect-ratio: 4/3) {
@@ -703,7 +708,7 @@
                   </a>
                 </li>
                 <li>
-                  <version>0.8.1</version>
+                  <version>0.8.2</version>
                 </li>
               </ul>
             </dropdown>
