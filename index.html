@@ -103,6 +103,7 @@
         justify-content: space-evenly;
         margin: 0;
         font-family: sora;
+        overflow-x: scroll;
         overflow-y: hidden;
       }
       header {
@@ -112,6 +113,7 @@
         left: 0;
         display: flex;
         width: var(--header-width);
+        animation: fade-in 800ms ease-in forwards;
         justify-content: space-between;
         padding: var(--card-padding) var(--header-padding) 0;
         font-size: var(--font-size);
@@ -294,18 +296,6 @@
       overlay dropdown version::before {
         content: "version: ";
       }
-      screen {
-        position: fixed;
-        z-index: 1;
-        top: 0;
-        right: 0;
-        bottom: 2rem;
-        left: 0;
-        animation: screen-out 800ms ease-in forwards;
-        box-shadow: inset 0 0 var(--card-gap) var(--card-gap)
-          var(--color-background);
-        pointer-events: none;
-      }
       tokens,
       synths {
         display: flex;
@@ -349,6 +339,18 @@
         background-position: center;
         background-repeat: no-repeat;
         background-size: contain;
+      }
+      screen {
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        right: 0;
+        bottom: 2rem;
+        left: 0;
+        animation: screen-out 800ms ease-in forwards;
+        box-shadow: inset 0 0 var(--card-gap) var(--card-gap)
+          var(--color-background);
+        pointer-events: none;
       }
       noscript {
         position: fixed;
@@ -494,6 +496,14 @@
           opacity: 0;
           transform: translateX(-0.5em) translateY(-2em) scaleX(0) scaleY(0)
             rotate(-60deg);
+        }
+      }
+      @keyframes fade-in {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
         }
       }
       @keyframes screen-out {
@@ -708,7 +718,7 @@
                   </a>
                 </li>
                 <li>
-                  <version>0.8.3</version>
+                  <version>0.8.4</version>
                 </li>
               </ul>
             </dropdown>
