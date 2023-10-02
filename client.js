@@ -28,7 +28,7 @@ const hiddenTokens = [
   "frax",
   "lusd",
   "husd",
-  "soshiba"
+  "soshiba",
 ];
 
 const appEl = document.documentElement.querySelector("app");
@@ -186,11 +186,13 @@ fetchTokens().then((value) => {
   const [xst, rest] = separate(filtered, (token) =>
     (token || "").startsWith("xst")
   );
-  if (filtered.length % 2 !== 0) rest.push("soshiba")
+  if (filtered.length % 2 !== 0) rest.push("soshiba");
   const difflength = xst.length - rest.length;
   tokens.push(
     ...rest,
-    ...xst.splice(xst.length - Math.floor(difflength / 2), xst.length - 1).reverse()
+    ...xst
+      .splice(xst.length - Math.floor(difflength / 2), xst.length - 1)
+      .reverse()
   );
   synths.push(...xst);
   createCards();
@@ -222,7 +224,7 @@ function createCard(parentEl) {
     icons[token] = icon;
     icon.src = "./images/icons/" + token + ".png";
     icon.addEventListener("load", () => resetLays(token));
-    fetchData(token).then(resetLays)
+    fetchData(token).then(resetLays);
   };
 }
 
@@ -245,7 +247,12 @@ function isPeak(index, array) {
   const prev = array[index - 1] ? array[index - 1][1] : null;
   const cur = array[index] ? array[index][1] : null;
   const next = array[index + 1] ? array[index + 1][1] : null;
-  return (cur > prev && cur > next) || (cur < prev && cur < next);
+  return (
+    prev === null ||
+    next === null ||
+    (cur > prev && cur > next) ||
+    (cur < prev && cur < next)
+  );
 }
 
 function findNearestPeak(index, array, timeRange) {
@@ -255,7 +262,7 @@ function findNearestPeak(index, array, timeRange) {
   for (let i = 1; i < array.length; i++) {
     for (const direction of [-1, 1]) {
       const targetIndex = index + i * direction;
-      if (targetIndex <= 0 || targetIndex >= array.length) continue;
+      if (targetIndex < 0 || targetIndex >= array.length) continue;
       const [time] = array[targetIndex];
       const timeDiff = Math.abs(currentTime - time);
       if (timeDiff > timeRange) continue;
@@ -271,10 +278,11 @@ function findNearestPeak(index, array, timeRange) {
 
 function findIndexes(points = [], x = 0) {
   if (points.length === 0) return [-1, -1];
+  if (points.length === 1) return [0, 0];
   const lastIndex = points.length - 1;
   let low = 0;
   let high = lastIndex;
-  while (low <= high) {
+  while (low < high) {
     const index = (low + high) >>> 1;
     const value = points[index][0];
     if (value < x) {
@@ -285,8 +293,8 @@ function findIndexes(points = [], x = 0) {
       return [index, index];
     }
   }
-  if (low < 1) return [0, 0];
-  if (low > lastIndex) return [lastIndex, lastIndex];
+  if (low <= 0) return [0, 0];
+  if (low >= lastIndex) return [lastIndex - 1, lastIndex];
   return [low - 1, low];
 }
 
@@ -302,7 +310,7 @@ function createUpdateOverlay(token) {
       const points = pointsset[token] || [];
       if (cutted.length < 1 || points.length < 1) return;
       const { x, y } = getMousePos(canvasEl, event);
-      if (x < 0 || y < 100 || x > 360 || y > 285) {
+      if (x < 0 || y < 100 || x > 328 || y > 285) {
         return drawOverlay({
           token,
           value: cutted[cutted.length - 1][1] || 0,
@@ -310,19 +318,15 @@ function createUpdateOverlay(token) {
           timestamp: cutted[cutted.length - 1][0],
         });
       }
-      const [left, right] = findIndexes(points, x);
-      const [leftTime, leftValue] = cutted[left];
-      const [rightTime, rightValue] = cutted[right];
-      const [leftX, leftY] = points[left];
-      const [rightX, rightY] = points[right];
       let value, crossX, crossY, timestamp;
       const timeRange =
         {
-          "1w": 30 * 60 * 1000,
-          "1m": 150 * 60 * 1000,
-          "1y": 300 * 60 * 1000,
+          "1w": 23 * 60 * 1000,
+          "1m": 30 * 60 * 1000,
+          "1y": 90 * 60 * 1000,
         }[timeframe] || 0;
-      const nearestPeakIndex = findNearestPeak(left, cutted, timeRange);
+      const [leftIndex, rightIndex] = findIndexes(points, x);
+      const nearestPeakIndex = findNearestPeak(leftIndex, cutted, timeRange);
       if (nearestPeakIndex !== null) {
         const [peakTime, peakValue] = cutted[nearestPeakIndex];
         const [peakX, peakY] = points[nearestPeakIndex];
@@ -331,6 +335,10 @@ function createUpdateOverlay(token) {
         crossY = peakY;
         timestamp = peakTime;
       } else {
+        const [leftTime, leftValue] = cutted[leftIndex];
+        const [rightTime, rightValue] = cutted[rightIndex];
+        const [leftX, leftY] = points[leftIndex];
+        const [rightX, rightY] = points[rightIndex];
         let ratio = (x - leftX) / (rightX - leftX);
         if (ratio < 0) ratio = 0;
         if (ratio > 1) ratio = 1;
@@ -364,7 +372,7 @@ function checkTimestamp() {
   fetch("./timestamp.json", { cache: "reload" })
     .then((response) => response.text())
     .then(JSON.parse)
-    .catch(() => { })
+    .catch(() => {})
     .then((timestamp) => {
       updateEl.innerText = timestamp
         ? Math.round((Date.now() - timestamp) / 60000) + "m ago"
@@ -384,7 +392,7 @@ function fetchData(token) {
     .then((response) => response.text())
     .then(JSON.parse)
     .catch(() => [])
-    .then((data) => ((dataset[token] = data), token))
+    .then((data) => ((dataset[token] = data), token));
 }
 
 async function resetLays(token) {
@@ -432,7 +440,18 @@ function drawLink(linkEl, timestamp) {
   const date = formatZero(time.getDate());
   const hour = formatZero(time.getHours());
   const minutes = formatZero(time.getMinutes());
-  linkEl.innerHTML = "[ <span>" + year + "." + month + "." + date + "</span> | <span>" + hour + ":" + minutes + "</span> ]";
+  linkEl.innerHTML =
+    "[ <span>" +
+    year +
+    "." +
+    month +
+    "." +
+    date +
+    "</span> | <span>" +
+    hour +
+    ":" +
+    minutes +
+    "</span> ]";
 }
 
 function drawOverlay({
