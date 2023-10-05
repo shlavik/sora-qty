@@ -32,7 +32,7 @@ const tokens = ["xor", "val", "pswap", "tbcd", "xst", "xstusd"];
 const dataset = Object.fromEntries(
   await Promise.all(
     tokens.map((token) =>
-      import("./data/monthly/" + token + ".json", { assert: { type: "json" } })
+      import("./data/prepared/" + token + ".json", { assert: { type: "json" } })
         .then((result) => result.default)
         .catch(() => [])
         .then((value) => [token, value])

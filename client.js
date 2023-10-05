@@ -6,6 +6,7 @@ import {
   drawCross,
   drawValue,
   getMousePos,
+  isPeak,
   separate,
 } from "./core.js";
 
@@ -243,18 +244,6 @@ function createCards() {
   });
 }
 
-function isPeak(index, array) {
-  const prev = array[index - 1] ? array[index - 1][1] : null;
-  const cur = array[index] ? array[index][1] : null;
-  const next = array[index + 1] ? array[index + 1][1] : null;
-  return (
-    prev === null ||
-    next === null ||
-    (cur > prev && cur > next) ||
-    (cur < prev && cur < next)
-  );
-}
-
 function findNearestPeak(index, array, timeRange) {
   const currentTime = array[index][0];
   let nearestPeakIndex = null;
@@ -322,8 +311,8 @@ function createUpdateOverlay(token) {
       const timeRange =
         {
           "1w": 23 * 60 * 1000,
-          "1m": 30 * 60 * 1000,
-          "1y": 90 * 60 * 1000,
+          "1m": 47 * 60 * 1000,
+          "1y": 231 * 60 * 1000,
         }[timeframe] || 0;
       const [leftIndex, rightIndex] = findIndexes(points, x);
       const nearestPeakIndex = findNearestPeak(leftIndex, cutted, timeRange);
@@ -386,7 +375,7 @@ function checkTimestamp() {
 }
 
 function fetchData(token) {
-  return fetch("./data/monthly/" + token + ".json", {
+  return fetch("./data/prepared/" + token + ".json", {
     cache: "reload",
   })
     .then((response) => response.text())

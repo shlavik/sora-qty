@@ -1,4 +1,4 @@
-import { cutData, formatValue } from "./core.js";
+import { cutData, subDays } from "./core.js";
 
 import tokens from "./tokens.json" assert { type: "json" };
 
@@ -16,9 +16,10 @@ grab().then((grabbed) => {
   );
   const write = (token) => (data) => {
     Deno.writeTextFile("./data/" + token + ".json", JSON.stringify(data));
+    const prepared = cutData(data, subDays(now, 366).valueOf());
     Deno.writeTextFile(
-      "./data/monthly/" + token + ".json",
-      JSON.stringify(data)
+      "./data/prepared/" + token + ".json",
+      JSON.stringify(prepared)
     );
   };
   grabbed.forEach(([token, qty]) => {
@@ -29,13 +30,6 @@ grab().then((grabbed) => {
       .then(write(token));
   });
 });
-
-function parseValue(str) {
-  const float = parseFloat(str);
-  if (Number.isNaN(float)) return NaN;
-  const round = Math.round(100_000 * float) / 100_000;
-  return round < 100 ? round : Math.trunc(round);
-}
 
 function grab() {
   return Promise.allSettled(
@@ -50,4 +44,11 @@ function grab() {
       .map(({ value }) => value)
       .filter(([_, value]) => value >= 0)
   );
+}
+
+function parseValue(str) {
+  const float = parseFloat(str);
+  if (Number.isNaN(float)) return NaN;
+  const round = Math.round(100_000 * float) / 100_000;
+  return round < 100 ? round : Math.trunc(round);
 }
