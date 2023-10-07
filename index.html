@@ -309,29 +309,34 @@
         justify-content: center;
         margin: 0 var(--card-margin);
       }
-      card:hover {
+      card.focused {
         z-index: 2;
       }
       card a.source {
         position: absolute;
         bottom: -0.25rem;
         display: none;
+        touch-action: none;
         color: var(--color-secondary);
         font-size: 2rem;
         font-weight: bold;
         text-decoration: none;
-        text-shadow: 0 0 0.1em var(--color-secondary);
       }
       card a.source:active,
       card a.source:focus {
         color: var(--color-danger);
-        text-shadow: none;
       }
-      card:hover a.source {
+      card.focused a.source {
         display: inline;
+        touch-action: auto;
       }
       card a.source span {
         color: var(--color-danger);
+        text-shadow: 0 0 0.1em var(--color-secondary);
+      }
+      card a.source:active span,
+      card a.source:focus span {
+        text-shadow: none;
       }
       canvas {
         width: var(--card-width);
@@ -397,6 +402,8 @@
         }
         card a.source:hover {
           color: var(--color-danger);
+        }
+        card a.source:hover span {
           text-shadow: none;
         }
       }
@@ -715,7 +722,7 @@
                   </a>
                 </li>
                 <li>
-                  <version>0.9.1</version>
+                  <version>0.9.2</version>
                 </li>
               </ul>
             </dropdown>

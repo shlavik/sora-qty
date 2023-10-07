@@ -13,11 +13,11 @@ import {
 const tokens = [];
 const synths = [];
 const dataset = {};
-const canvasEls = {};
-const icons = {};
 const cuttedset = {};
 const pointsset = {};
 const underlays = {};
+const canvasEls = {};
+const iconEls = {};
 const linkEls = {};
 
 const hiddenTokens = [
@@ -202,6 +202,12 @@ fetchTokens().then((value) => {
 });
 
 function createCard(parentEl) {
+  const focus = ({ target }) => {
+    setTimeout(() => target.classList.add("focused"));
+  };
+  const blur = ({ target }) => {
+    setTimeout(() => target.classList.remove("focused"));
+  };
   return (token) => {
     const canvasEl = document.createElement("canvas");
     canvasEls[token] = canvasEl;
@@ -210,21 +216,26 @@ function createCard(parentEl) {
     canvasEl.addEventListener("mousemove", createUpdateOverlay(token), false);
     canvasEl.addEventListener("mouseleave", () => resetLays(token), false);
     drawUnderlay(token);
-    const link = document.createElement("a");
-    linkEls[token] = link;
-    link.className = "source";
-    link.href = "https://mof.sora.org/qty/" + token;
-    link.target = "_blank";
-    link.title = "[check source]";
-    link.innerText = token.toUpperCase();
-    const card = document.createElement("card");
-    card.appendChild(canvasEl);
-    card.appendChild(link);
-    parentEl.appendChild(card);
-    const icon = document.createElement("img");
-    icons[token] = icon;
-    icon.src = "./images/icons/" + token + ".png";
-    icon.addEventListener("load", () => resetLays(token));
+    const linkEl = document.createElement("a");
+    linkEls[token] = linkEl;
+    linkEl.className = "source";
+    linkEl.href = "https://mof.sora.org/qty/" + token;
+    linkEl.target = "_blank";
+    linkEl.title = "[check source]";
+    linkEl.innerText = token.toUpperCase();
+    const cardEl = document.createElement("card");
+    cardEl.tabIndex = -1;
+    cardEl.addEventListener("focus", focus);
+    cardEl.addEventListener("blur", blur);
+    cardEl.addEventListener("mouseenter", focus);
+    cardEl.addEventListener("mouseleave", blur);
+    cardEl.appendChild(canvasEl);
+    cardEl.appendChild(linkEl);
+    parentEl.appendChild(cardEl);
+    const iconEl = document.createElement("img");
+    iconEls[token] = iconEl;
+    iconEl.src = "./images/icons/" + token + ".png";
+    iconEl.addEventListener("load", () => resetLays(token));
     fetchData(token).then(resetLays);
   };
 }
@@ -393,7 +404,7 @@ async function drawUnderlay(token) {
   const data = dataset[token];
   const canvas = canvasEls[token];
   const context = canvas.getContext("2d", { willReadFrequently: true });
-  const icon = icons[token];
+  const icon = iconEls[token];
   const { cutted, points } = drawCard(context, {
     token,
     data,

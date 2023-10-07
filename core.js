@@ -266,7 +266,7 @@ export function drawValue(ctx, [x, y], value = 0) {
 export function addSeparator(text) {
   return new Intl.NumberFormat("en-US", {
     minimumFractionDigits: 0,
-    maximumFractionDigits: 3,
+    maximumFractionDigits: 2,
   }).format(text);
 }
 
