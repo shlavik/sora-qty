@@ -225,10 +225,10 @@ function createCard(parentEl) {
     linkEl.innerText = token.toUpperCase();
     const cardEl = document.createElement("card");
     cardEl.tabIndex = -1;
-    cardEl.addEventListener("focus", focus);
-    cardEl.addEventListener("blur", blur);
-    cardEl.addEventListener("mouseenter", focus);
-    cardEl.addEventListener("mouseleave", blur);
+    cardEl.addEventListener("focus", focus, true);
+    cardEl.addEventListener("blur", blur, true);
+    cardEl.addEventListener("mouseenter", focus, true);
+    cardEl.addEventListener("mouseleave", blur, true);
     cardEl.appendChild(canvasEl);
     cardEl.appendChild(linkEl);
     parentEl.appendChild(cardEl);
