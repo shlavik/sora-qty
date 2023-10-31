@@ -526,18 +526,6 @@ export function separate(arr, cb) {
   );
 }
 
-export function isPeak(index, array) {
-  const prev = array[index - 1] ? array[index - 1][1] : null;
-  const cur = array[index] ? array[index][1] : null;
-  const next = array[index + 1] ? array[index + 1][1] : null;
-  return (
-    prev === null ||
-    next === null ||
-    (cur > prev && cur > next) ||
-    (cur < prev && cur < next)
-  );
-}
-
 function isDeno() {
   return typeof Deno !== "undefined";
 }

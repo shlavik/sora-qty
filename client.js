@@ -6,7 +6,6 @@ import {
   drawCross,
   drawValue,
   getMousePos,
-  isPeak,
   separate,
 } from "./core.js";
 
@@ -29,7 +28,6 @@ const hiddenTokens = [
   "frax",
   "lusd",
   "husd",
-  "soshiba",
 ];
 
 const appEl = document.documentElement.querySelector("app");
@@ -187,7 +185,6 @@ fetchTokens().then((value) => {
   const [xst, rest] = separate(filtered, (token) =>
     (token || "").startsWith("xst")
   );
-  if (filtered.length % 2 !== 0) rest.push("soshiba");
   const difflength = xst.length - rest.length;
   tokens.push(
     ...rest,
@@ -255,47 +252,64 @@ function createCards() {
   });
 }
 
-function findNearestPeak(index, array, timeRange) {
-  const currentTime = array[index][0];
-  let nearestPeakIndex = null;
-  let nearestPeakTimeDiff = Number.MAX_SAFE_INTEGER;
-  for (let i = 1; i < array.length; i++) {
-    for (const direction of [-1, 1]) {
-      const targetIndex = index + i * direction;
-      if (targetIndex < 0 || targetIndex >= array.length) continue;
-      const [time] = array[targetIndex];
-      const timeDiff = Math.abs(currentTime - time);
-      if (timeDiff > timeRange) continue;
-      if (isPeak(targetIndex, array) && timeDiff < nearestPeakTimeDiff) {
-        nearestPeakIndex = targetIndex;
-        nearestPeakTimeDiff = timeDiff;
-      }
+function findIndexes(data = [], x = 0) {
+  if (data.length === 0) return [0, 0];
+  if (data.length === 1) return [0, 1];
+  let low = 0;
+  let high = data.length - 1;
+  while (low <= high) {
+    const mid = Math.floor((low + high) / 2);
+    if (data[mid][0] < x) {
+      low = mid + 1;
+    } else if (data[mid][0] > x) {
+      high = mid - 1;
+    } else {
+      return [mid, mid];
     }
-    if (nearestPeakIndex !== null) break;
   }
-  return nearestPeakIndex;
+  return [Math.max(0, low - 1), Math.min(data.length - 1, low)];
 }
 
-function findIndexes(points = [], x = 0) {
-  if (points.length === 0) return [-1, -1];
-  if (points.length === 1) return [0, 0];
-  const lastIndex = points.length - 1;
-  let low = 0;
-  let high = lastIndex;
-  while (low < high) {
-    const index = (low + high) >>> 1;
-    const value = points[index][0];
-    if (value < x) {
-      low = index + 1;
-    } else if (value > x) {
-      high = index - 1;
-    } else {
-      return [index, index];
+function findClosestIndex(data, x, leftIndex, rightIndex) {
+  return leftIndex === rightIndex ||
+    Math.abs(data[leftIndex][0] - x) < Math.abs(data[rightIndex][0] - x)
+    ? leftIndex
+    : rightIndex;
+}
+
+function xToTimestamp(data, points, x) {
+  const ratio =
+    (x - points[0][0]) / (points[points.length - 1][0] - points[0][0]);
+  const diff = data[data.length - 1][0] - data[0][0];
+  return data[0][0] + ratio * diff;
+}
+
+function findClosestPeak(data, startIndex, startTimestamp, timeRange) {
+  const startTime = startTimestamp - timeRange;
+  const endTime = startTimestamp + timeRange;
+  let peakIndex = null;
+  let peakValue = data[startIndex][1];
+  for (let i = startIndex; i < data.length && data[i][0] <= endTime; i++) {
+    if (
+      Math.abs(data[i][1] - peakValue) > 0 &&
+      (peakIndex === null ||
+        Math.abs(data[i][1]) > Math.abs(data[peakIndex][1]))
+    ) {
+      peakIndex = i;
+      peakValue = data[i][1];
     }
   }
-  if (low <= 0) return [0, 0];
-  if (low >= lastIndex) return [lastIndex - 1, lastIndex];
-  return [low - 1, low];
+  for (let i = startIndex; i >= 0 && data[i][0] >= startTime; i--) {
+    if (
+      Math.abs(data[i][1] - peakValue) > 0 &&
+      (peakIndex === null ||
+        Math.abs(data[i][1]) > Math.abs(data[peakIndex][1]))
+    ) {
+      peakIndex = i;
+      peakValue = data[i][1];
+    }
+  }
+  return peakIndex;
 }
 
 function createUpdateOverlay(token) {
@@ -321,15 +335,22 @@ function createUpdateOverlay(token) {
       let value, crossX, crossY, timestamp;
       const timeRange =
         {
-          "1w": 23 * 60 * 1000,
-          "1m": 47 * 60 * 1000,
-          "1y": 231 * 60 * 1000,
+          "1w": 25 * 60 * 1000,
+          "1m": 100 * 60 * 1000,
+          "1y": 1200 * 60 * 1000,
         }[timeframe] || 0;
       const [leftIndex, rightIndex] = findIndexes(points, x);
-      const nearestPeakIndex = findNearestPeak(leftIndex, cutted, timeRange);
-      if (nearestPeakIndex !== null) {
-        const [peakTime, peakValue] = cutted[nearestPeakIndex];
-        const [peakX, peakY] = points[nearestPeakIndex];
+      const closestIndex = findClosestIndex(points, x, leftIndex, rightIndex);
+      const xTimestamp = xToTimestamp(cutted, points, x);
+      const nearestIndex = findClosestPeak(
+        cutted,
+        closestIndex,
+        xTimestamp,
+        timeRange
+      );
+      if (nearestIndex) {
+        const [peakTime, peakValue] = cutted[nearestIndex];
+        const [peakX, peakY] = points[nearestIndex];
         value = peakValue;
         crossX = peakX;
         crossY = peakY;
