@@ -28,6 +28,7 @@ const hiddenTokens = [
   "frax",
   "lusd",
   "husd",
+  "caps",
 ];
 
 const appEl = document.documentElement.querySelector("app");
@@ -322,9 +323,9 @@ function createUpdateOverlay(token) {
       if (underlays[token]) context.putImageData(underlays[token], 0, 0);
       const cutted = cuttedset[token] || [];
       const points = pointsset[token] || [];
-      if (cutted.length < 1 || points.length < 1) return;
+      if (cutted.length === 0) return;
       const { x, y } = getMousePos(canvasEl, event);
-      if (x < 0 || y < 100 || x > 328 || y > 285) {
+      if (cutted.length === 1 || x < 0 || y < 100 || x > 328 || y > 285) {
         return drawOverlay({
           token,
           value: cutted[cutted.length - 1][1] || 0,

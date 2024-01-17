@@ -179,6 +179,9 @@ export function drawDetails(
   [[x1, y1], [x2, y2]],
   { data = [], timeframe, valueVisible = true, crossVisible = true } = {}
 ) {
+  x1 += 1;
+  x2 -= 1;
+  if (timeframe === "1y") x2 -= 1;
   const padding = 20;
   const valueY = 195;
   const now = Date.now();
