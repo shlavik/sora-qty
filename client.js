@@ -49,7 +49,6 @@ function updateRem() {
       "font-size",
       0.01 * document.documentElement.clientHeight + "px"
     );
-    appEl.scrollLeft = 0;
   });
 }
 
@@ -214,6 +213,9 @@ function createCard(parentEl) {
     canvasEl.addEventListener("mousemove", createUpdateOverlay(token), false);
     canvasEl.addEventListener("mouseleave", () => resetLays(token), false);
     drawUnderlay(token);
+    const tickerEl = document.createElement("ticker");
+    tickerEl.className = "length-" + token.length;
+    tickerEl.innerText = token.toUpperCase();
     const linkEl = document.createElement("a");
     linkEls[token] = linkEl;
     linkEl.className = "source";
@@ -228,6 +230,7 @@ function createCard(parentEl) {
     cardEl.addEventListener("mouseenter", focus, true);
     cardEl.addEventListener("mouseleave", blur, true);
     cardEl.appendChild(canvasEl);
+    cardEl.appendChild(tickerEl);
     cardEl.appendChild(linkEl);
     parentEl.appendChild(cardEl);
     const iconEl = document.createElement("img");
@@ -242,8 +245,8 @@ function createCards() {
   tokensEl.className = timeframe;
   tokens.forEach(createCard(tokensEl));
   synths.forEach(createCard(synthsEl));
-  const scroll = Number(localStorage.getItem("scroll")) || 0;
-  if (scroll === 0) return;
+  const scroll = Number(localStorage.getItem("scroll"));
+  if (!scroll) return;
   const { clientWidth, scrollWidth } = appEl;
   setTimeout(() => {
     const scrollLeft = Math.round(

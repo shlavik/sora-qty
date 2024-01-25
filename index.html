@@ -232,7 +232,11 @@
           rotate(-60deg);
         transform-origin: calc(100% - var(--card-margin)) 0.5em;
       }
+      overlay:not(.closing) dropdown {
+        visibility: hidden;
+      }
       overlay.opened dropdown {
+        visibility: visible;
         animation: dropdown-in ease-out 300ms forwards;
         pointer-events: all;
       }
@@ -312,6 +316,31 @@
       }
       card.focused {
         z-index: 2;
+      }
+      card ticker {
+        position: absolute;
+        top: 3.2rem;
+        right: 4.7rem;
+        padding: 0 1rem;
+        background-color: #51276c;
+        font-size: 7.2rem;
+        line-height: 1;
+      }
+      card ticker.length-4 {
+        padding-top: 0.7rem;
+        font-size: 6.2rem;
+      }
+      card ticker.length-5 {
+        padding-top: 1rem;
+        font-size: 5.5rem;
+      }
+      card ticker.length-6 {
+        padding-top: 1.3rem;
+        font-size: 5.1rem;
+      }
+      card ticker.length-7 {
+        padding-top: 1.6rem;
+        font-size: 4.6rem;
       }
       card a.source {
         position: absolute;
@@ -434,7 +463,7 @@
           bottom: 0;
         }
       }
-      @media (max-aspect-ratio: 4/5) {
+      @media (max-aspect-ratio: 6/7) {
         h1 span::before {
           content: "quantity";
         }
@@ -448,15 +477,37 @@
         h1 span::before {
           content: "quantity";
         }
-        h2 {
-          font-size: 1em;
-        }
         overlay dropdown ul {
           padding: 1em;
         }
         overlay dropdown svg,
         overlay dropdown span {
           margin-right: 1em;
+        }
+        card ticker {
+          top: 6.8vw;
+          right: 9.3vw;
+          padding: 0 2vw;
+          font-size: 15.6vw;
+        }
+        card ticker.length-4 {
+          padding-top: 1.2vw;
+          font-size: 13.2vw;
+        }
+        card ticker.length-5 {
+          padding-top: 2vw;
+          font-size: 11.8vw;
+        }
+        card ticker.length-6 {
+          padding-top: 2.4vw;
+          font-size: 10.8vw;
+        }
+        card ticker.length-7 {
+          padding-top: 3vw;
+          font-size: 9.9vw;
+        }
+        card a.source {
+          font-size: 4.2vw;
         }
       }
       @keyframes dropdown-in {
@@ -723,7 +774,7 @@
                   </a>
                 </li>
                 <li>
-                  <version>0.9.6</version>
+                  <version>0.9.7</version>
                 </li>
               </ul>
             </dropdown>
