@@ -27,7 +27,7 @@ const fontPath = "./fonts/Sora-SemiBold.ttf";
 const fontFile = Deno.readFileSync(fontPath);
 Fonts.register(fontFile, "sora");
 
-const tokens = ["xor", "val", "pswap", "tbcd", "xst", "xstusd"];
+const tokens = ["xor", "tbcd", "val", "pswap", "dot", "ksm"];
 
 const dataset = Object.fromEntries(
   await Promise.all(
@@ -80,8 +80,8 @@ function renderCard(token) {
     ],
     {
       tokens: [
-        ["xor", "val", "pswap"],
-        ["tbcd", "xst", "xstusd"],
+        ["xor", "val", "dot"],
+        ["tbcd", "pswap", "ksm"],
       ],
     }
   );
