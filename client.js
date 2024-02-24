@@ -272,7 +272,7 @@ function getLinkEl(token) {
   linkEl.href = "https://mof.sora.org/qty/" + token;
   linkEl.target = "_blank";
   linkEl.title = "[check source]";
-  linkEl.innerText = token.toUpperCase();
+  linkEl.innerText = "LOADING...";
   getLinkEl.cache[token] = linkEl;
   return linkEl;
 }
