@@ -302,10 +302,10 @@ function createCards() {
   tokens[mode].forEach(createCard);
   const scroll = Number(localStorage.getItem("scroll"));
   if (!scroll) return;
-  const { clientWidth, scrollWidth } = appEl;
+  appEl.scrollLeft = 0;
   setTimeout(() => {
     appEl.scrollLeft = Math.round(
-      ((scrollWidth - clientWidth) * scroll) / 100000000
+      ((appEl.scrollWidth - appEl.clientWidth) * scroll) / 100000000
     );
   });
 }
