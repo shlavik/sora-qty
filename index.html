@@ -281,16 +281,21 @@
       }
       overlay dropdown li:last-child {
         justify-content: center;
-        margin: 0.5em 0 0;
       }
-      overlay dropdown a {
+      overlay dropdown li a {
         display: flex;
         flex: 1;
         align-items: center;
         color: var(--color-background);
       }
-      overlay dropdown a:active,
-      overlay dropdown a:focus {
+      overlay dropdown li:nth-last-child(2) a {
+        margin: 0.5em 0 0;
+        color: var(--color-secondary);
+      }
+      overlay dropdown li a:active,
+      overlay dropdown li a:focus,
+      overlay dropdown li:nth-last-child(2) a:active,
+      overlay dropdown li:nth-last-child(2) a:focus {
         color: var(--color-accent);
       }
       overlay dropdown svg,
@@ -438,7 +443,8 @@
         overlay:not(.opened) handle:hover svg {
           color: var(--color-success);
         }
-        overlay dropdown a:hover {
+        overlay dropdown li a:hover,
+        overlay dropdown li:nth-last-child(2) a:hover {
           color: var(--color-accent);
         }
         overlay dropdown update:hover,
@@ -794,7 +800,7 @@
                   </a>
                 </li>
                 <li>
-                  <version>1.0.2</version>
+                  <version>1.0.3</version>
                 </li>
               </ul>
             </dropdown>
