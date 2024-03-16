@@ -63,7 +63,10 @@ addEventListener("wheel", (event) => {
 });
 
 addEventListener("keydown", (event) => {
-  switch (event.key) {
+  if (event.shiftKey && event.code === "Space") {
+    return (appEl.scrollLeft -= 0.8 * appEl.clientWidth);
+  }
+  switch (event.code) {
     case "ArrowLeft":
       event.preventDefault();
       return (appEl.scrollLeft -= 0.2 * appEl.clientWidth);
@@ -81,6 +84,7 @@ addEventListener("keydown", (event) => {
     case "PageUp":
       return (appEl.scrollLeft -= 0.8 * appEl.clientWidth);
     case "PageDown":
+    case "Space":
       return (appEl.scrollLeft += 0.8 * appEl.clientWidth);
     case "End":
       return (appEl.scrollLeft = appEl.scrollWidth);
