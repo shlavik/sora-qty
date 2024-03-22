@@ -44,7 +44,9 @@ addEventListener("resize", updateRem);
 
 function getScroll() {
   const { clientWidth, scrollLeft, scrollWidth } = appEl;
-  return Math.round((scrollLeft / (scrollWidth - clientWidth)) * 100000000);
+  return Math.round(
+    (Math.round(scrollLeft) / (scrollWidth - clientWidth)) * 100000000
+  );
 }
 
 const updateLocalStorageScrollDebounced = debounce(

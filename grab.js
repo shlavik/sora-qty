@@ -1,6 +1,6 @@
 import { cutData, subDays } from "./core.js";
 
-import tokens from "./tokens.json" assert { type: "json" };
+import tokens from "./tokens.json" with { type: "json" };
 
 const baseUrl = "https://mof.sora.org/qty/";
 

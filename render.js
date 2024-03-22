@@ -1,8 +1,4 @@
-import {
-  createCanvas,
-  Fonts,
-  Image,
-} from "https://deno.land/x/skia_canvas@0.5.4/mod.ts";
+import { createCanvas, Fonts, Image } from "jsr:@gfx/canvas@0.5.6";
 
 import {
   cardHeight,
@@ -32,7 +28,7 @@ const tokens = ["xor", "tbcd", "val", "pswap", "dot", "ksm", "eth", "dai"];
 const dataset = Object.fromEntries(
   await Promise.all(
     tokens.map((token) =>
-      import("./data/prepared/" + token + ".json", { assert: { type: "json" } })
+      import("./data/prepared/" + token + ".json", { with: { type: "json" } })
         .then((result) => result.default)
         .catch(() => [])
         .then((value) => [token, value])
@@ -42,14 +38,16 @@ const dataset = Object.fromEntries(
 
 (function renderReadme() {
   const header = "# [Sora quantity monitor](https://sora-qty.info)\n\n";
-  const date = "> " + new Date() + "\n\n";
+  const description =
+    "Check circulating supply of [Sora](https://sora.org) ecosystem tokens\n\n";
+  const date = "> last update: " + new Date().toISOString() + "\n\n";
   const pics = tokens
     .map((token) => {
       const url = "https://mof.sora.org/qty/" + token;
       return `[![${url}](./images/${token}.png "${url}")](${url})`;
     })
     .join("\n");
-  Deno.writeTextFile("./README.md", header + date + pics);
+  Deno.writeTextFile("./README.md", header + description + date + pics);
 })();
 
 (function renderTimeStamp() {

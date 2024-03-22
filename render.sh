@@ -1,1 +1,1 @@
-deno --unstable run --allow-all ./render.js
+deno --unstable-ffi run --allow-all ./render.js

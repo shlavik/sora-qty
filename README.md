@@ -1,6 +1,8 @@
 # [Sora quantity monitor](https://sora-qty.info)
 
-> Fri Mar 22 2024 14:11:21 GMT+0000 (Coordinated Universal Time)
+Check circulating supply of [Sora](https://sora.org) ecosystem tokens
+
+> 2024-04-01T23:25:37.517Z
 
 [![https://mof.sora.org/qty/xor](./images/xor.png "https://mof.sora.org/qty/xor")](https://mof.sora.org/qty/xor)
 [![https://mof.sora.org/qty/tbcd](./images/tbcd.png "https://mof.sora.org/qty/tbcd")](https://mof.sora.org/qty/tbcd)
