@@ -21,7 +21,14 @@ const cardPadding = 32;
 const iconX = cardPadding + 16;
 const iconY = cardPadding;
 const iconSize = 48;
+const detailsX1 = cardPadding;
 const detailsY1 = 102;
+const detailsX2 = cardWidth - cardPadding;
+const detailsY2 = cardHeight - cardPadding;
+const detailsPos = [
+  [detailsX1, detailsY1],
+  [detailsX2, detailsY2],
+];
 
 export function drawCard(
   ctx,
@@ -32,9 +39,10 @@ export function drawCard(
     timeframe = "1m",
     crossVisible = true,
     valueVisible = true,
+    cached = true,
   } = {}
 ) {
-  drawBackground(ctx, timeframe, false);
+  drawBackground(ctx, timeframe, cached);
   if (icon) {
     drawImage(ctx, [iconX, iconY], {
       img: icon,
@@ -43,38 +51,20 @@ export function drawCard(
     });
   }
   if (token) drawToken(ctx, [cardWidth - iconSize, 62], token);
-  return drawDetails(
-    ctx,
-    [
-      [cardPadding, detailsY1],
-      [cardWidth - cardPadding, cardHeight - cardPadding],
-    ],
-    {
-      data,
-      timeframe,
-      valueVisible,
-      crossVisible,
-    }
-  );
-}
-
-export function drawBackground(ctx, timeframe = "1w", cached = true) {
-  const background = getBackground(ctx, timeframe, cached);
-  if (!cached) return;
-  ctx.putImageData(background, 0, 0);
+  return drawDetails(ctx, detailsPos, {
+    data,
+    timeframe,
+    valueVisible,
+    crossVisible,
+  });
 }
 
 const backgroundCache = {};
 
-function getBackground(ctx, timeframe = "1w", cached = true) {
-  if (backgroundCache[timeframe]) return backgroundCache[timeframe];
-  if (cached) {
-    const canvas = createCanvas(cardWidth, cardHeight);
-    canvas.width = cardWidth;
-    canvas.height = cardHeight;
-    ctx = canvas.getContext("2d");
+export function drawBackground(ctx, timeframe = "1w", cached = true) {
+  if (cached && backgroundCache[timeframe]) {
+    return ctx.putImageData(backgroundCache[timeframe], 0, 0);
   }
-  // FILL COLOR
   drawRect(
     ctx,
     [
@@ -85,7 +75,6 @@ function getBackground(ctx, timeframe = "1w", cached = true) {
       fill: colorBackground,
     }
   );
-  // ICON CIRCLE
   drawBorder(
     ctx,
     [
@@ -94,32 +83,17 @@ function getBackground(ctx, timeframe = "1w", cached = true) {
     ],
     { radius: 2 + iconSize / 2 }
   );
-  // RULLER
-  drawRuler(
-    ctx,
-    [
-      [cardPadding, detailsY1],
-      [cardWidth - cardPadding, cardHeight - cardPadding],
-    ],
-    { timeframe }
-  );
-  // OUTER BORDER
+  drawRuler(ctx, detailsPos, { timeframe });
+  drawGradient(ctx, detailsPos, { timeframe });
   drawBorder(
     ctx,
     [
       [cardPadding - 2, detailsY1 - 2],
-      [cardWidth - cardPadding + 2, cardHeight - cardPadding + 2],
+      [detailsX2 + 2, detailsY2 + 2],
     ],
     { radius: 20 }
   );
-  if (!cached) return;
-  backgroundCache[timeframe] = ctx.getImageData(
-    0,
-    0,
-    canvas.width,
-    canvas.height
-  );
-  return backgroundCache[timeframe];
+  // backgroundCache[timeframe] = ctx.getImageData(0, 0, cardWidth, cardHeight);
 }
 
 export function drawRuler(
@@ -129,9 +103,9 @@ export function drawRuler(
 ) {
   const line =
     {
-      "1w": 1.7,
-      "1m": 1,
-      "1y": 0.4,
+      "1w": 2,
+      "1m": 1.25,
+      "1y": 0.5,
     }[timeframe] || 1;
   const segment =
     {
@@ -156,6 +130,44 @@ export function drawRuler(
       );
     }
   }
+}
+
+export function drawGradient(
+  ctx,
+  [[x1, y1], [x2, y2]],
+  {
+    color1 = colorBackground,
+    color2 = "rgba(81, 39, 108, 0.5)",
+    color3 = "rgba(81, 39, 108, 0)",
+    height = iconSize,
+    timeframe,
+    ratio1 = {
+      "1w": 0.1,
+      "1m": 0.1,
+      "1y": 0,
+    }[timeframe] || 0.1,
+    ratio2 = {
+      "1w": 0.6,
+      "1m": 0.5,
+      "1y": 0.4,
+    }[timeframe] || 0.5,
+  } = {}
+) {
+  const topGradient = ctx.createLinearGradient(0, y1, 0, y1 + height);
+  topGradient.addColorStop(0, color1);
+  topGradient.addColorStop(ratio1, color1);
+  topGradient.addColorStop(ratio2, color2);
+  topGradient.addColorStop(1, color3);
+  ctx.fillStyle = topGradient;
+  ctx.fillRect(x1, y1, x2 - x1, height);
+
+  const bottomGradient = ctx.createLinearGradient(0, y2, 0, y2 - height);
+  bottomGradient.addColorStop(0, color1);
+  bottomGradient.addColorStop(ratio1, color1);
+  bottomGradient.addColorStop(ratio2, color2);
+  bottomGradient.addColorStop(1, color3);
+  ctx.fillStyle = bottomGradient;
+  ctx.fillRect(x1, y2 - height, x2 - x1, height);
 }
 
 export function drawToken(ctx, [x, y], token = "") {

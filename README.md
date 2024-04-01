@@ -2,7 +2,7 @@
 
 Check circulating supply of [Sora](https://sora.org) ecosystem tokens
 
-> 2024-04-01T23:25:37.517Z
+> last update: 2024-04-26T08:57:23.346Z
 
 [![https://mof.sora.org/qty/xor](./images/xor.png "https://mof.sora.org/qty/xor")](https://mof.sora.org/qty/xor)
 [![https://mof.sora.org/qty/tbcd](./images/tbcd.png "https://mof.sora.org/qty/tbcd")](https://mof.sora.org/qty/tbcd)

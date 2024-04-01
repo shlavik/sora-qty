@@ -63,6 +63,7 @@ function renderCard(token) {
     token,
     data: dataset[token],
     icon: "./images/icons/" + token + ".png",
+    cached: false,
   });
   canvas.save("./images/" + token + ".png");
 }
