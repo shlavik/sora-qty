@@ -1,8 +1,8 @@
 # [Sora quantity monitor](https://sora-qty.info)
 
-Check circulating supply of [Sora](https://sora.org) ecosystem tokens
+Check circulating supply of [Sora](https://sora.org) selected tokens
 
-> last update: 2024-04-26T08:57:23.346Z
+> last update: 2024-05-19T04:58:53.044Z
 
 [![https://mof.sora.org/qty/xor](./images/xor.png "https://mof.sora.org/qty/xor")](https://mof.sora.org/qty/xor)
 [![https://mof.sora.org/qty/tbcd](./images/tbcd.png "https://mof.sora.org/qty/tbcd")](https://mof.sora.org/qty/tbcd)

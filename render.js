@@ -39,7 +39,7 @@ const dataset = Object.fromEntries(
 (function renderReadme() {
   const header = "# [Sora quantity monitor](https://sora-qty.info)\n\n";
   const description =
-    "Check circulating supply of [Sora](https://sora.org) ecosystem tokens\n\n";
+    "Check circulating supply of [Sora](https://sora.org) selected tokens\n\n";
   const date = "> last update: " + new Date().toISOString() + "\n\n";
   const pics = tokens
     .map((token) => {
