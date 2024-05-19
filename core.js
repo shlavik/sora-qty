@@ -264,7 +264,7 @@ export function drawChart(ctx, points = []) {
 
 export function drawValue(ctx, [x, y], value = 0) {
   const text = addSeparator(formatValue(value));
-  const size = value > 99999999999 ? 32 : 36;
+  const size = value > 99999999999 ? 32 : value > 9999999999 ? 34 : 36;
   const padding = size / 3;
   const gradient = ctx.createLinearGradient(x, y - padding, x, y + padding);
   gradient.addColorStop(0, "yellow");
@@ -272,7 +272,7 @@ export function drawValue(ctx, [x, y], value = 0) {
   drawText(ctx, [x, y], {
     text,
     gradient,
-    line: 4,
+    line: 4.5,
     stroke: colorYear,
     size,
   });
