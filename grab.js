@@ -1,4 +1,4 @@
-import { cutData, subDays } from "./core.js";
+import { cutData, subDays, preciseTokens } from "./core.js";
 
 import tokens from "./tokens.json" with { type: "json" };
 
@@ -36,8 +36,13 @@ function grab() {
     tokens.map((token) =>
       fetch(baseUrl + token)
         .then((response) => response.text())
-        .then((text) => [token, parseValue(text)])
-    )
+        .then((text) => [
+          token,
+          preciseTokens.includes(token)
+            ? parsePreciseValue(text)
+            : parseValue(text)
+        ])
+    ),
   ).then((result) =>
     result
       .filter(({ status }) => status === "fulfilled")
@@ -51,4 +56,11 @@ function parseValue(str) {
   if (Number.isNaN(float)) return NaN;
   const round = Math.round(100_000 * float) / 100_000;
   return round < 100 ? round : Math.trunc(round);
+}
+
+function parsePreciseValue(str) {
+  const float = parseFloat(str);
+  if (Number.isNaN(float)) return NaN;
+  const round = Math.round(1000 * float) / 1000;
+  return round;
 }

@@ -505,7 +505,7 @@ function drawOverlay({
   cross = [],
   timestamp = 0,
 }) {
-  if (value >= 0) drawValue(context, [180, 195], value);
+  if (value >= 0) drawValue(context, [180, 195], { token, value });
   drawCross(context, cross);
   if (timestamp) updateLink(getLinkEl(token), timestamp);
 }

@@ -1,3 +1,5 @@
+export const preciseTokens = ["karma", "ken", "xstbtc"];
+
 let createCanvas = (cardWidth, cardHeight) => document.createElement("canvas");
 
 export function registerCreateCanvas(cc) {
@@ -53,6 +55,7 @@ export function drawCard(
   if (token) drawToken(ctx, [cardWidth - iconSize, 62], token);
   return drawDetails(ctx, detailsPos, {
     data,
+    token,
     timeframe,
     valueVisible,
     crossVisible,
@@ -189,7 +192,7 @@ export function drawToken(ctx, [x, y], token = "") {
 export function drawDetails(
   ctx,
   [[x1, y1], [x2, y2]],
-  { data = [], timeframe, valueVisible = true, crossVisible = true } = {}
+  { data = [], token, timeframe, valueVisible = true, crossVisible = true } = {}
 ) {
   x1 += 1;
   x2 -= 1;
@@ -238,7 +241,7 @@ export function drawDetails(
       drawValue(
         ctx,
         [cardPadding + (x2 - x1) / 2, valueY - (isDeno() ? 2 : 0)],
-        value
+        { token, value }
       );
   }
   // CROSS
@@ -262,8 +265,9 @@ export function drawChart(ctx, points = []) {
   ctx.restore();
 }
 
-export function drawValue(ctx, [x, y], value = 0) {
-  const text = addSeparator(formatValue(value));
+export function drawValue(ctx, [x, y], { token, value = 0 }) {
+  value = preciseTokens.includes(token) ? value : formatValue(value);
+  const text = addSeparator(value);
   const size = value > 99999999999 ? 32 : value > 9999999999 ? 34 : 36;
   const padding = size / 3;
   const gradient = ctx.createLinearGradient(x, y - padding, x, y + padding);
