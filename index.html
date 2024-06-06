@@ -36,13 +36,13 @@
         src: url("./fonts/Sora-SemiBold.ttf");
       }
       ::-webkit-scrollbar {
-        height: 0.32em;
+        height: 2rem;
         background-color: var(--color-background);
         font-size: var(--font-size);
       }
       ::-webkit-scrollbar-thumb {
         border: var(--card-border);
-        border-radius: 2em;
+        border-radius: 1rem;
         background-color: var(--color-primary);
       }
       ::-webkit-scrollbar-thumb:active {
@@ -323,6 +323,11 @@
         grid-template-rows: 1fr 1fr;
         height: calc(2 * var(--card-height));
         padding: 0 var(--card-gap);
+      }
+      @-moz-document url-prefix() {
+        content {
+          padding-bottom: 2rem;
+        }
       }
       tokens,
       synths {
@@ -780,7 +785,7 @@
                   </a>
                 </li>
                 <li>
-                  <version>1.0.10</version>
+                  <version>1.0.11</version>
                 </li>
               </ul>
             </dropdown>
