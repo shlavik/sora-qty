@@ -265,6 +265,10 @@ export function drawChart(ctx, points = []) {
   ctx.restore();
 }
 
+export function formatValue(value) {
+  return value >= 100 ? Math.round(value) : value;
+}
+
 export function drawValue(ctx, [x, y], { token, value = 0 }) {
   value = preciseTokens.includes(token) ? value : formatValue(value);
   const text = addSeparator(value);
@@ -352,10 +356,6 @@ export function drawText(
   ctx.restore();
 }
 
-export function formatValue(value) {
-  return value >= 100 ? Math.round(value) : value;
-}
-
 export function cutData(data = [], start = 0) {
   const index = data.findIndex(([t]) => t >= start);
   if (index <= 0) return data;
@@ -365,7 +365,6 @@ export function cutData(data = [], start = 0) {
   const [nextTime, nextValue] = data[index];
   const ratio = (start - prevTime) / (nextTime - prevTime);
   let value = prevValue + ratio * (nextValue - prevValue);
-  value = formatValue(value);
   slice.unshift([start, value]);
   return slice;
 }
