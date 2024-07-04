@@ -2,7 +2,7 @@
 
 Check circulating supply of [Sora](https://sora.org) selected tokens
 
-> last update: 2024-07-04T14:49:34.341Z
+> last update: 2024-07-09T16:44:09.513Z
 
 [![https://mof.sora.org/qty/xor](./images/xor.png "https://mof.sora.org/qty/xor")](https://mof.sora.org/qty/xor)
 [![https://mof.sora.org/qty/tbcd](./images/tbcd.png "https://mof.sora.org/qty/tbcd")](https://mof.sora.org/qty/tbcd)
