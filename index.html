@@ -24,6 +24,18 @@
       href="./manifest.json"
     />
     <link rel="icon" type="image/png" href="./images/icons/icon.svg" />
+    <script>
+      function updateRem() {
+        setTimeout(() => {
+          document.documentElement.style.setProperty(
+            "font-size",
+            0.01 * document.documentElement.clientHeight + "px"
+          );
+        });
+      }
+      updateRem();
+      addEventListener("resize", updateRem);
+    </script>
     <style>
       tokens,
       synths {
@@ -818,7 +830,7 @@
                   </a>
                 </li>
                 <li>
-                  <version>1.14.1</version>
+                  <version>1.15.0</version>
                 </li>
               </ul>
             </dropdown>

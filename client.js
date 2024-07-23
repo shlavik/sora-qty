@@ -30,18 +30,6 @@ const updateEl = dropdownEl.querySelector("update");
 const contentEl = appEl.querySelector("content");
 const screenEl = appEl.querySelector("screen");
 
-function updateRem() {
-  setTimeout(() => {
-    document.documentElement.style.setProperty(
-      "font-size",
-      0.01 * document.documentElement.clientHeight + "px"
-    );
-  });
-}
-
-updateRem();
-addEventListener("resize", updateRem);
-
 function getScroll() {
   const { clientWidth, scrollLeft, scrollWidth } = appEl;
   return Math.round(

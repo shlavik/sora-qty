@@ -96,7 +96,9 @@ export function drawBackground(ctx, timeframe = "1w", cached = true) {
     ],
     { radius: 20 }
   );
-  // backgroundCache[timeframe] = ctx.getImageData(0, 0, cardWidth, cardHeight);
+  if (cached && !backgroundCache[timeframe]) {
+    backgroundCache[timeframe] = ctx.getImageData(0, 0, cardWidth, cardHeight);
+  }
 }
 
 export function drawRuler(
