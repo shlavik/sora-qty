@@ -214,10 +214,10 @@ export function drawDetails(
   if (data.length > 0) {
     const textX = (x1 + x2) / 2;
     drawText(ctx, [textX, y1 + padding], {
-      text: addSeparator(max),
+      text: addSeparator(formatValue(max, token)),
     });
     drawText(ctx, [textX, y2 - padding + (isDeno() ? 0 : 2)], {
-      text: addSeparator(min),
+      text: addSeparator(formatValue(min, token)),
     });
   }
   // CHART
@@ -267,12 +267,13 @@ export function drawChart(ctx, points = []) {
   ctx.restore();
 }
 
-export function formatValue(value) {
+export function formatValue(value, token) {
+  if (preciseTokens.includes(token)) return value;
   return value >= 100 ? Math.round(value) : value;
 }
 
 export function drawValue(ctx, [x, y], { token, value = 0 }) {
-  value = preciseTokens.includes(token) ? value : formatValue(value);
+  value = formatValue(value, token);
   const text = addSeparator(value);
   const size = value > 99999999999 ? 32 : value > 9999999999 ? 34 : 36;
   const padding = size / 3;
