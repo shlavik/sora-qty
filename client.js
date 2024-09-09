@@ -15,7 +15,7 @@ const cuttedset = {};
 const pointsset = {};
 const underlays = {};
 
-const hiddenTokens = ["busd", "tusd", "frax", "lusd", "husd"];
+const hiddenTokens = ["busd", "tusd", "frax", "lusd", "husd", "caps"];
 
 const appEl = document.documentElement.querySelector("app");
 const headerEl = appEl.querySelector("header");
