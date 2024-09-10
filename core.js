@@ -1,4 +1,4 @@
-export const preciseTokens = ["karma", "ken", "xstbtc"];
+export const preciseTokens = ["karma", "ken", "kbtc", "xstbtc"];
 
 let createCanvas = (cardWidth, cardHeight) => document.createElement("canvas");
 

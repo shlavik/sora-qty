@@ -74,9 +74,9 @@ function formatValue(value, token) {
   const float = typeof value === "string" ? parseFloat(value) : value;
   if (Number.isNaN(float)) return NaN;
   if (preciseTokens.includes(token)) {
-    const round = Math.round(1000 * float) / 1000;
+    const round = Math.round(100_000 * float) / 100_000;
     return round;
   }
-  const round = Math.round(100_000 * float) / 100_000;
+  const round = Math.round(1000 * float) / 1000;
   return round < 100 ? round : Math.trunc(round);
 }
