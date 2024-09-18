@@ -6,8 +6,9 @@ import {
   subDays,
 } from "./core.js";
 
-import tokens from "./tokens.json" with { type: "json" };
+import tokensObj from "./tokens.json" with { type: "json" };
 
+const tokens = Object.values(tokensObj).flatMap(el => el);
 const baseUrl = "https://mof.sora.org/qty/";
 
 grab().then((grabbed) => {
