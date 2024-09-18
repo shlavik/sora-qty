@@ -23,19 +23,6 @@
       type="application/manifest+json; charset=utf-8"
       href="./manifest.json"
     />
-    <link rel="icon" type="image/png" href="./images/icons/icon.svg" />
-    <script>
-      function updateRem() {
-        setTimeout(() => {
-          document.documentElement.style.setProperty(
-            "font-size",
-            0.01 * document.documentElement.clientHeight + "px"
-          );
-        });
-      }
-      updateRem();
-      addEventListener("resize", updateRem);
-    </script>
     <style>
       @font-face {
         font-family: sora;
@@ -74,6 +61,7 @@
         filter: brightness(0.8);
       }
       html {
+        --dot-mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 32 32"><path d="M16.1098 13.2157c-.1-.0054-.2-.0054-.3 0a2.8 2.8 0 0 0-1.5.5c-1.2697.951-1.4965 2.7658-.5 4 .9446 1.205 2.682 1.4277 3.9.5 1.2-1 1.5-2.7.5-4-.5-.6-1.3-1-2-1z"/></svg>');
         --color-background: #51276c;
         --color-primary: #fff;
         --color-secondary: #000;
@@ -110,14 +98,13 @@
       app {
         position: relative;
         display: flex;
+        overflow: scroll hidden;
         height: 100rem;
         flex-direction: column;
         align-items: flex-start;
         justify-content: space-evenly;
         margin: 0;
         font-family: sora;
-        overflow-x: scroll;
-        overflow-y: hidden;
       }
       header {
         position: sticky;
@@ -126,9 +113,9 @@
         left: 0;
         display: flex;
         width: var(--header-width);
-        animation: fade-in 800ms ease-in forwards;
         justify-content: space-between;
         padding: var(--card-padding) var(--header-padding) 0;
+        animation: fade-in 800ms ease-in forwards;
         font-size: var(--font-size);
         line-height: 1;
       }
@@ -158,46 +145,53 @@
         position: relative;
         display: flex;
         height: 0.85em;
+        align-items: center;
         align-self: center;
-        padding: 0 calc(4.5 * var(--card-pixel));
         border: var(--card-border);
         border-radius: 0.5em;
         margin-left: 0.5em;
         background: var(--color-primary);
       }
+      mode {
+        padding: 0 calc(3 * var(--card-pixel));
+      }
+      timeframe {
+        padding: 0 calc(4.5 * var(--card-pixel));
+      }
       mode a,
       timeframe a {
         display: flex;
+        min-height: 1.7em;
         align-items: center;
         justify-content: center;
         border-radius: 1em;
-        margin: 0 calc(-4.5 * var(--card-pixel));
         color: var(--color-background);
         font-size: 0.5em;
       }
       mode a {
         width: 3.4em;
+        margin: 0 calc(-3 * var(--card-pixel));
       }
       timeframe a {
         width: 2.8em;
-      }
-      mode a:active timeframe a:active {
-        color: var(--color-success);
+        margin: 0 calc(-4 * var(--card-pixel));
       }
       mode[data-mode="xor"] a#xor,
+      mode[data-mode="ken"] a#ken,
       mode[data-mode="xst"] a#xst,
-      timeframe[data-timeframe="1w"] a:nth-child(1),
-      timeframe[data-timeframe="1m"] a:nth-child(2),
-      timeframe[data-timeframe="1y"] a:nth-child(3) {
+      timeframe[data-timeframe="week"] a#week,
+      timeframe[data-timeframe="month"] a#month,
+      timeframe[data-timeframe="year"] a#year {
         z-index: 1;
         background-color: var(--color-background);
         color: var(--color-primary);
       }
       mode[data-mode="xor"] a#xor:active,
+      mode[data-mode="ken"] a#ken:active,
       mode[data-mode="xst"] a#xst:active,
-      timeframe[data-timeframe="1w"] a:nth-child(1):active,
-      timeframe[data-timeframe="1m"] a:nth-child(2):active,
-      timeframe[data-timeframe="1y"] a:nth-child(3):active {
+      timeframe[data-timeframe="week"] a#week:active,
+      timeframe[data-timeframe="month"] a#month:active,
+      timeframe[data-timeframe="year"] a#year:active {
         background-color: var(--color-accent);
       }
       overlay {
@@ -257,9 +251,9 @@
         visibility: hidden;
       }
       overlay.opened dropdown {
-        visibility: visible;
         animation: dropdown-in ease-out 300ms forwards;
         pointer-events: all;
+        visibility: visible;
       }
       overlay:not(.opened).closing dropdown {
         animation: dropdown-out ease-in 250ms forwards;
@@ -327,10 +321,10 @@
       }
       content {
         display: grid;
-        grid-auto-flow: column;
-        grid-template-rows: 1fr 1fr;
         height: calc(2 * var(--card-height));
         padding: 0 var(--card-gap);
+        grid-auto-flow: column;
+        grid-template-rows: 1fr 1fr;
       }
       @-moz-document url-prefix() {
         content {
@@ -342,41 +336,45 @@
         display: flex;
         justify-content: center;
         margin: 0 var(--card-margin);
+        font-size: 42rem;
       }
       card ticker {
         position: absolute;
-        top: 3.2rem;
-        right: 4.7rem;
-        padding: 0 1rem;
+        top: 0.4em;
+        right: 0.72em;
         background-color: #51276c;
-        font-size: 7.2rem;
+        font-size: 0.18em;
         line-height: 1;
       }
       card ticker.length-4 {
-        padding-top: 0.7rem;
-        font-size: 6.2rem;
+        top: 0.6em;
+        right: 0.88em;
+        font-size: 0.15em;
       }
       card ticker.length-5 {
-        padding-top: 1rem;
-        font-size: 5.5rem;
+        top: 0.7em;
+        right: 0.96em;
+        font-size: 0.138em;
       }
       card ticker.length-6 {
-        padding-top: 1.3rem;
-        font-size: 5.1rem;
+        top: 0.79em;
+        right: 1em;
+        font-size: 0.128em;
       }
       card ticker.length-7 {
-        padding-top: 1.6rem;
-        font-size: 4.6rem;
+        top: 0.94em;
+        right: 1.1em;
+        font-size: 0.115em;
       }
       card a.source {
         position: absolute;
         bottom: -0.25rem;
         display: none;
-        touch-action: none;
         color: var(--color-secondary);
         font-size: 2rem;
         font-weight: bold;
         text-decoration: none;
+        touch-action: none;
       }
       card a.source:active,
       card a.source:focus {
@@ -435,10 +433,11 @@
           color: var(--color-success);
         }
         mode[data-mode="xor"] a#xor:focus,
+        mode[data-mode="ken"] a#ken:focus,
         mode[data-mode="xst"] a#xst:focus,
-        timeframe[data-timeframe="1w"] a:nth-child(1):focus,
-        timeframe[data-timeframe="1m"] a:nth-child(2):focus,
-        timeframe[data-timeframe="1y"] a:nth-child(3):focus {
+        timeframe[data-timeframe="week"] a#week:focus,
+        timeframe[data-timeframe="month"] a#month:focus,
+        timeframe[data-timeframe="year"] a#year:focus {
           background-color: var(--color-accent);
         }
         overlay.opened handle:focus svg {
@@ -483,12 +482,12 @@
           touch-action: auto;
         }
       }
-      @media (max-aspect-ratio: 17/12) {
+      @media (max-aspect-ratio: 17/11) {
         h1 span::before {
           content: "quantity";
         }
       }
-      @media (max-aspect-ratio: 41/36) {
+      @media (max-aspect-ratio: 37/30) {
         html {
           --card-gap: var(--card-padding);
         }
@@ -500,10 +499,7 @@
           content: "quantity monitor";
         }
         mode {
-          margin-left: 0;
-        }
-        timeframe {
-          margin-right: auto;
+          margin-left: auto;
         }
         card {
           margin: 0;
@@ -517,23 +513,72 @@
           content: "quantity";
         }
       }
-      @media (max-aspect-ratio: 2/3) {
+      @media (max-aspect-ratio: 5/7) {
         h2 {
           justify-content: space-between;
           font-size: 0.85em;
         }
         mode,
-        timeframe,
         overlay {
           margin: 0;
+        }
+        mode {
+          overflow: hidden;
+          width: 2.25em;
+          justify-content: space-between;
+          cursor: pointer;
+        }
+        mode:focus-within {
+          overflow: visible;
+          flex-direction: column;
+        }
+        mode:focus-within::before {
+          position: absolute;
+          z-index: -1;
+          top: calc(-3 * var(--card-pixel));
+          display: block;
+          width: 100%;
+          height: 2.57em;
+          border: var(--card-border);
+          border-radius: 0.5em;
+          background-color: var(--color-primary);
+          box-shadow: 0 0 var(--card-padding) var(--card-margin)
+            var(--color-background);
+          content: "";
+        }
+        mode a {
+          min-height: 1.7em;
+        }
+        mode:focus-within a {
+          width: calc(100% + 6 * var(--card-pixel));
+        }
+        mode:not(:focus-within)[data-mode="xor"] a#ken,
+        mode:not(:focus-within)[data-mode="xor"] a#xst,
+        mode:not(:focus-within)[data-mode="ken"] a#xor,
+        mode:not(:focus-within)[data-mode="ken"] a#xst,
+        mode:not(:focus-within)[data-mode="xst"] a#xor,
+        mode:not(:focus-within)[data-mode="xst"] a#ken {
+          margin: 0 -33%;
+          background-color: var(--color-background);
+          color: transparent;
+          mask-image: var(--dot-mask);
+          mask-position: center;
+          mask-repeat: no-repeat;
+          pointer-events: none;
+        }
+        timeframe {
+          margin: auto;
+        }
+        card a.source {
+          font-size: 0.05em;
         }
       }
       @media (max-aspect-ratio: 1/2) {
         h1 span::before {
           content: "quantity";
         }
-        card ticker {
-          display: none;
+        card {
+          font-size: calc(var(--card-width));
         }
       }
       @keyframes dropdown-in {
@@ -597,6 +642,19 @@
         }
       }
     </style>
+    <link rel="icon" type="image/png" href="./images/icons/icon.svg" />
+    <script>
+      function updateRem() {
+        setTimeout(() => {
+          document.documentElement.style.setProperty(
+            "font-size",
+            0.01 * document.documentElement.clientHeight + "px"
+          );
+        });
+      }
+      updateRem();
+      addEventListener("resize", updateRem);
+    </script>
     <script
       async
       src="https://www.googletagmanager.com/gtag/js?id=G-FL6DQC8FHB"
@@ -624,14 +682,15 @@
           <span title="mostly, number of coins in circulation"></span>
         </h1>
         <h2>
-          <mode>
+          <mode tabindex="-1">
             <a id="xor" href="#" title="[native & bridged assets]">XOR</a>
+            <a id="ken" href="#" title="[over-collateralized assets]">KEN</a>
             <a id="xst" href="#" title="[synthetic assets]">XST</a>
           </mode>
           <timeframe data-timeframe="1w">
-            <a id="1w" href="#" title="[1 week]">1W</a>
-            <a id="1m" href="#" title="[1 month]">1M</a>
-            <a id="1y" href="#" title="[1 year]">1Y</a>
+            <a id="week" href="#" title="[1 week]">1W</a>
+            <a id="month" href="#" title="[1 month]">1M</a>
+            <a id="year" href="#" title="[1 year]">1Y</a>
           </timeframe>
           <overlay>
             <handle role="button" tabindex="0" title="[open menu]">
@@ -819,7 +878,7 @@
                   </a>
                 </li>
                 <li>
-                  <version>1.17.0</version>
+                  <version>1.18.0</version>
                 </li>
               </ul>
             </dropdown>

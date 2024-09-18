@@ -38,7 +38,7 @@ export function drawCard(
     token = "",
     data = [],
     icon = null,
-    timeframe = "1m",
+    timeframe = month,
     crossVisible = true,
     valueVisible = true,
     cached = true,
@@ -64,7 +64,7 @@ export function drawCard(
 
 const backgroundCache = {};
 
-export function drawBackground(ctx, timeframe = "1w", cached = true) {
+export function drawBackground(ctx, timeframe = week, cached = true) {
   if (cached && backgroundCache[timeframe]) {
     return ctx.putImageData(backgroundCache[timeframe], 0, 0);
   }
@@ -108,15 +108,15 @@ export function drawRuler(
 ) {
   const line =
     {
-      "1w": 2,
-      "1m": 1.25,
-      "1y": 0.5,
+      week: 2,
+      month: 1.25,
+      year: 0.5,
     }[timeframe] || 1;
   const segment =
     {
-      "1w": 7,
-      "1m": 33,
-      "1y": 148,
+      week: 7,
+      month: 33,
+      year: 148,
     }[timeframe] || 33;
   const step = (x2 - x1) / segment;
   for (let i = segment; i > 0; i--) {
@@ -147,14 +147,14 @@ export function drawGradient(
     height = iconSize,
     timeframe,
     ratio1 = {
-      "1w": 0.1,
-      "1m": 0.1,
-      "1y": 0,
+      week: 0.1,
+      month: 0.1,
+      year: 0,
     }[timeframe] || 0.1,
     ratio2 = {
-      "1w": 0.6,
-      "1m": 0.5,
-      "1y": 0.4,
+      week: 0.6,
+      month: 0.5,
+      year: 0.4,
     }[timeframe] || 0.5,
   } = {}
 ) {
@@ -177,13 +177,14 @@ export function drawGradient(
 
 export function drawToken(ctx, [x, y], token = "") {
   const tokenAlign = "right";
-  const tokenSize = {
-    3: 62,
-    4: 54,
-    5: 48,
-    6: 44,
-    7: 40,
-  }[token.length];
+  const tokenSize =
+    {
+      3: 62,
+      4: 54,
+      5: 48,
+      6: 44,
+      7: 40,
+    }[token.length] || 62;
   drawText(ctx, [x, y - (isDeno() ? 3 : 0)], {
     text: token.toUpperCase(),
     align: tokenAlign,
@@ -198,12 +199,12 @@ export function drawDetails(
 ) {
   x1 += 1;
   x2 -= 1;
-  if (timeframe === "1y") x2 -= 1;
+  if (timeframe === year) x2 -= 1;
   const padding = 20;
   const valueY = 195;
   const now = Date.now();
   const start = startOfDay(
-    subDays(now, { "1w": 6, "1m": 32, "1y": 366 }[timeframe])
+    subDays(now, { week: 6, month: 32, year: 366 }[timeframe])
   ).valueOf();
   const end = endOfDay(now).valueOf();
   const step = (x2 - x1) / (end - start);
@@ -224,9 +225,9 @@ export function drawDetails(
   const chartPadding =
     padding +
     {
-      "1w": 5,
-      "1m": 7,
-      "1y": 10,
+      week: 5,
+      month: 7,
+      year: 10,
     }[timeframe];
   const height = y2 - y1 - 3 * chartPadding;
   const points = cutted.map(([t, v]) => [
@@ -531,20 +532,6 @@ export function throttle(cb, delay) {
     wait = true;
     setTimeout(() => (wait = false), delay);
   };
-}
-
-export function separate(arr, cb) {
-  return arr.reduce(
-    (acc, item, index) => {
-      if (cb(item, index, arr)) {
-        acc[0].push(item);
-      } else {
-        acc[1].push(item);
-      }
-      return acc;
-    },
-    [[], []]
-  );
 }
 
 function isDeno() {

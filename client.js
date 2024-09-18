@@ -6,7 +6,6 @@ import {
   drawCross,
   drawValue,
   getMousePos,
-  separate,
 } from "./core.js";
 
 let tokens = {};
@@ -14,18 +13,6 @@ let dataset = {};
 const cuttedset = {};
 const pointsset = {};
 const underlays = {};
-
-const hiddenTokens = [
-  "busd",
-  "tusd",
-  "frax",
-  "lusd",
-  "husd",
-  "caps",
-  "kxag",
-  "keur",
-  "kjpy",
-];
 
 const appEl = document.documentElement.querySelector("app");
 const headerEl = appEl.querySelector("header");
@@ -53,7 +40,6 @@ const updateLocalStorageScrollDebounced = debounce(
 );
 
 appEl.addEventListener("scroll", () => {
-  closeDropdown();
   updateLocalStorageScrollDebounced();
 });
 
@@ -155,16 +141,17 @@ dropdownLinks[dropdownLinks.length - 1].addEventListener("focus", () => {
 let mode =
   {
     xor: "xor",
+    ken: "ken",
     xst: "xst",
   }[localStorage.getItem("mode")] || "xor";
 modeEl.dataset.mode = mode;
 
 let timeframe =
   {
-    "1w": "1w",
-    "1m": "1m",
-    "1y": "1y",
-  }[localStorage.getItem("timeframe")] || "1m";
+    week: "week",
+    month: "month",
+    year: "year",
+  }[localStorage.getItem("timeframe")] || "month";
 timeframeEl.dataset.timeframe = timeframe;
 
 modeEl.addEventListener("click", (event) => {
@@ -203,11 +190,7 @@ function fetchTokens() {
 }
 
 fetchTokens().then((value) => {
-  const filtered = value.filter((token) => !hiddenTokens.includes(token));
-  const [xst, xor] = separate(filtered, (token) =>
-    (token || "").startsWith("xst")
-  );
-  tokens = { xor, xst };
+  tokens = value;
   createCards();
   checkTimestamp();
   setInterval(() => checkTimestamp(), 10000);
@@ -399,9 +382,9 @@ function createUpdateOverlay(
       let value, crossX, crossY, timestamp;
       const timeRange =
         {
-          "1w": 25 * 60 * 1000,
-          "1m": 100 * 60 * 1000,
-          "1y": 1200 * 60 * 1000,
+          week: 25 * 60 * 1000,
+          month: 100 * 60 * 1000,
+          year: 1200 * 60 * 1000,
         }[timeframe] || 0;
       const [leftIndex, rightIndex] = findIndexes(points, x);
       const closestIndex = findClosestIndex(points, x, leftIndex, rightIndex);
