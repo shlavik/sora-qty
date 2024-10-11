@@ -8,6 +8,17 @@ import {
   getMousePos,
 } from "./core.js";
 
+const MODES = {
+  xor: "xor",
+  ken: "ken",
+  xst: "xst",
+};
+const TIMEFRAMES = {
+  week: "week",
+  month: "month",
+  year: "year",
+};
+
 let tokens = {};
 let dataset = {};
 const cuttedset = {};
@@ -53,6 +64,18 @@ addEventListener("keydown", (event) => {
     return (appEl.scrollLeft -= 0.8 * appEl.clientWidth);
   }
   switch (event.code) {
+    case "Digit1":
+      return setTimeframe(TIMEFRAMES.week);
+    case "Digit2":
+      return setTimeframe(TIMEFRAMES.month);
+    case "Digit3":
+      return setTimeframe(TIMEFRAMES.year);
+    case "KeyQ":
+      return setMode(MODES.xor);
+    case "KeyW":
+      return setMode(MODES.ken);
+    case "KeyE":
+      return setMode(MODES.xst);
     case "ArrowLeft":
       event.preventDefault();
       return (appEl.scrollLeft -= 0.2 * appEl.clientWidth);
@@ -82,6 +105,7 @@ function isDropdownOpened() {
 }
 
 function openDropdown() {
+  if (isDropdownOpened()) return;
   overlayEl.classList.add("opened");
   overlayEl.classList.remove("closing");
 }
@@ -138,27 +162,11 @@ dropdownLinks[dropdownLinks.length - 1].addEventListener("focus", () => {
   openDropdown();
 });
 
-let mode =
-  {
-    xor: "xor",
-    ken: "ken",
-    xst: "xst",
-  }[localStorage.getItem("mode")] || "xor";
+let mode = MODES[localStorage.getItem("mode")] || MODES.xor;
 modeEl.dataset.mode = mode;
 
-let timeframe =
-  {
-    week: "week",
-    month: "month",
-    year: "year",
-  }[localStorage.getItem("timeframe")] || "month";
-timeframeEl.dataset.timeframe = timeframe;
-
-modeEl.addEventListener("click", (event) => {
-  event.preventDefault();
-  if (!event.target.id) return;
-  if (mode === event.target.id) return;
-  mode = event.target.id;
+function setMode(key) {
+  mode = MODES[key] || MODES.xor;
   modeEl.dataset.mode = mode;
   localStorage.setItem("mode", mode);
   screenEl.style.animation = "none";
@@ -168,15 +176,30 @@ modeEl.addEventListener("click", (event) => {
     contentEl.removeChild(contentEl.lastChild);
   }
   createCards();
+}
+
+modeEl.addEventListener("click", (event) => {
+  event.preventDefault();
+  if (!event.target.id) return;
+  if (mode === event.target.id) return;
+  setMode(event.target.id);
 });
+
+let timeframe =
+  TIMEFRAMES[localStorage.getItem("timeframe")] || TIMEFRAMES.month;
+timeframeEl.dataset.timeframe = timeframe;
+
+function setTimeframe(key) {
+  timeframe = TIMEFRAMES[key] || TIMEFRAMES.month;
+  timeframeEl.dataset.timeframe = timeframe;
+  localStorage.setItem("timeframe", timeframe);
+  tokens[mode].forEach(resetLays);
+}
 
 timeframeEl.addEventListener("click", (event) => {
   event.preventDefault();
   if (!event.target.id) return;
-  timeframe = event.target.id;
-  timeframeEl.dataset.timeframe = timeframe;
-  localStorage.setItem("timeframe", timeframe);
-  tokens[mode].forEach(resetLays);
+  setTimeframe(event.target.id);
 });
 
 function fetchTokens() {
