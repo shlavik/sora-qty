@@ -166,6 +166,7 @@ let mode = MODES[localStorage.getItem("mode")] || MODES.xor;
 modeEl.dataset.mode = mode;
 
 function setMode(key) {
+  if (key === mode) return;
   mode = MODES[key] || MODES.xor;
   modeEl.dataset.mode = mode;
   localStorage.setItem("mode", mode);
@@ -190,6 +191,7 @@ let timeframe =
 timeframeEl.dataset.timeframe = timeframe;
 
 function setTimeframe(key) {
+  if (key === timeframe) return;
   timeframe = TIMEFRAMES[key] || TIMEFRAMES.month;
   timeframeEl.dataset.timeframe = timeframe;
   localStorage.setItem("timeframe", timeframe);

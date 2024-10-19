@@ -278,11 +278,7 @@
         line-height: 2;
       }
       overlay dropdown li:first-child {
-        justify-content: center;
         margin: 0 0 0.5em;
-      }
-      overlay dropdown li:last-child {
-        justify-content: center;
       }
       overlay dropdown li a {
         display: flex;
@@ -290,14 +286,14 @@
         align-items: center;
         color: var(--color-background);
       }
-      overlay dropdown li:nth-last-child(2) a {
+      overlay dropdown li:last-child a {
         margin: 0.5em 0 0;
         color: var(--color-secondary);
       }
       overlay dropdown li a:active,
       overlay dropdown li a:focus,
-      overlay dropdown li:nth-last-child(2) a:active,
-      overlay dropdown li:nth-last-child(2) a:focus {
+      overlay dropdown li:last-child a:active,
+      overlay dropdown li:last-child a:focus {
         color: var(--color-accent);
       }
       overlay dropdown svg,
@@ -310,14 +306,10 @@
         white-space: nowrap;
       }
       overlay dropdown update::before {
-        content: "last update: ";
-      }
-      overlay dropdown version {
-        font-size: 0.85em;
-        font-weight: bold;
+        content: "Upd. ";
       }
       overlay dropdown version::before {
-        content: "version: ";
+        content: "Sora-qty ";
       }
       content {
         display: grid;
@@ -449,11 +441,11 @@
           color: var(--color-success);
         }
         overlay dropdown li a:hover,
-        overlay dropdown li:nth-last-child(2) a:hover {
+        overlay dropdown li:last-child a:hover {
           color: var(--color-accent);
         }
-        overlay dropdown update:hover,
-        overlay dropdown update:hover::before {
+        overlay dropdown li:first-child:hover,
+        overlay dropdown li:first-child:hover::before {
           color: var(--color-info);
         }
         card a.source:hover {
@@ -707,8 +699,18 @@
             </handle>
             <dropdown role="menu" aria-hidden="true">
               <ul>
-                <li>
-                  <update title="alas, non-real time">N/A</update>
+                <li title="alas, data is not updated in real time">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill-rule="evenodd"
+                    viewBox="0 0 32 32"
+                  >
+                    <path
+                      d="M16 4a12 12 0 1 0 0 24 12 12 0 0 0 0-24zm0 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm0 5a1 1 0 0 0-1 1v4a1 1 0 0 0 0 .3 1 1 0 0 0 .1.2 1 1 0 0 0 .2.2 1 1 0 0 0 .2.1l7 4a1 1 0 0 0 1.4-.4 1 1 0 0 0-.4-1.4L17 15.4V12a1 1 0 0 0-1-1z"
+                      style="fill: currentColor"
+                    />
+                  </svg>
+                  <update>N/A</update>
                 </li>
                 <li>
                   <a
@@ -874,11 +876,8 @@
                         fill="currentColor"
                       />
                     </svg>
-                    <span>Sora-qty GitHub</span>
+                    <version>1.18.2</version>
                   </a>
-                </li>
-                <li>
-                  <version>1.18.1</version>
                 </li>
               </ul>
             </dropdown>
