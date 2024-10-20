@@ -40,9 +40,7 @@ const screenEl = appEl.querySelector("screen");
 
 function getScroll() {
   const { clientWidth, scrollLeft, scrollWidth } = appEl;
-  return Math.round(
-    (Math.round(scrollLeft) / (scrollWidth - clientWidth)) * 100000000
-  );
+  return Math.round((scrollLeft / (scrollWidth - clientWidth)) * 1e8);
 }
 
 const updateLocalStorageScrollDebounced = debounce(
@@ -313,13 +311,11 @@ function createCard(token) {
 function createCards() {
   tokens[mode].forEach(createCard);
   const scroll = Number(localStorage.getItem("scroll"));
-  if (!scroll) return;
-  appEl.scrollLeft = 0;
-  setTimeout(() => {
-    appEl.scrollLeft = Math.round(
-      ((appEl.scrollWidth - appEl.clientWidth) * scroll) / 100000000
-    );
-  });
+  if (scroll <= 0) return;
+  const scrollLeft = Math.round(
+    (scroll * (appEl.scrollWidth - appEl.clientWidth)) / 1e8
+  );
+  appEl.scrollLeft = scrollLeft;
 }
 
 function findIndexes(data = [], x = 0) {
