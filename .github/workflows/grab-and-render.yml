@@ -1,4 +1,4 @@
-name: grab-and-draw
+name: grab-and-render
 on:
   schedule:
     - cron: "* * * * *"

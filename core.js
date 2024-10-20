@@ -38,7 +38,7 @@ export function drawCard(
     token = "",
     data = [],
     icon = null,
-    timeframe = month,
+    timeframe = "month",
     crossVisible = true,
     valueVisible = true,
     cached = true,
@@ -64,7 +64,7 @@ export function drawCard(
 
 const backgroundCache = {};
 
-export function drawBackground(ctx, timeframe = week, cached = true) {
+export function drawBackground(ctx, timeframe = "week", cached = true) {
   if (cached && backgroundCache[timeframe]) {
     return ctx.putImageData(backgroundCache[timeframe], 0, 0);
   }
@@ -199,7 +199,7 @@ export function drawDetails(
 ) {
   x1 += 1;
   x2 -= 1;
-  if (timeframe === year) x2 -= 1;
+  if (timeframe === "year") x2 -= 1;
   const padding = 20;
   const valueY = 195;
   const now = Date.now();
