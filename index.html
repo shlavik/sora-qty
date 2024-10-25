@@ -14,7 +14,7 @@
       name="keywords"
       content="Sora, circulating supply, cryptocurrency, crypto, token, coin, web3, quantity, qty, xor, val, pswap, xst, xstusd, dot, ksm, eth, dai, usdc, usdt, caps"
     />
-    <meta name="theme-color" content="#ffffff" />
+    <meta name="theme-color" content="#000000" />
     <meta property="og:image" content="./images/preview.png" />
     <meta name="twitter:card" content="summary_large_image" />
     <title>Sora quantity monitor</title>
@@ -31,13 +31,13 @@
         src: url("./fonts/Sora-SemiBold.ttf");
       }
       ::-webkit-scrollbar {
-        height: 2rem;
+        height: 2dvh;
         background-color: var(--color-background);
         font-size: var(--font-size);
       }
       ::-webkit-scrollbar-thumb {
         border: var(--card-border);
-        border-radius: 1rem;
+        border-radius: 1dvh;
         background-color: var(--color-primary);
       }
       ::-webkit-scrollbar-thumb:active {
@@ -70,14 +70,14 @@
         --color-warning: #e3c300;
         --color-success: #52e323;
         --color-info: #238be3;
-        --card-pixel: min(0.1166rem, 0.2444vmin);
+        --card-pixel: min(0.1166dvh, 0.2444vmin);
         --card-border: var(--color-primary) solid calc(3 * var(--card-pixel));
         --card-width: calc(360 * var(--card-pixel));
         --card-height: calc(315 * var(--card-pixel));
         --card-padding: calc(30 * var(--card-pixel));
-        --font-size: min(6.3rem, 9.6vmin);
+        --font-size: min(6dvh, 9.6vmin);
         --card-margin: calc(
-          (100rem - var(--card-padding) - var(--card-height)) / 32
+          (100dvh - var(--card-padding) - var(--card-height)) / 32
         );
         --card-gap: calc(var(--card-padding) + var(--card-margin));
         --header-width: calc(100vw - 2 * var(--header-padding));
@@ -99,7 +99,7 @@
         position: relative;
         display: flex;
         overflow: scroll hidden;
-        height: 100rem;
+        height: 100dvh;
         flex-direction: column;
         align-items: flex-start;
         justify-content: space-evenly;
@@ -320,7 +320,7 @@
       }
       @-moz-document url-prefix() {
         content {
-          padding-bottom: 2rem;
+          padding-bottom: 2dvh;
         }
       }
       card {
@@ -328,7 +328,7 @@
         display: flex;
         justify-content: center;
         margin: 0 var(--card-margin);
-        font-size: 42rem;
+        font-size: 42dvh;
       }
       card ticker {
         position: absolute;
@@ -360,10 +360,10 @@
       }
       card a.source {
         position: absolute;
-        bottom: -0.25rem;
+        bottom: -0.25dvh;
         display: none;
         color: var(--color-secondary);
-        font-size: 2rem;
+        font-size: 0.048em;
         font-weight: bold;
         text-decoration: none;
         touch-action: none;
@@ -393,7 +393,7 @@
         top: 0;
         right: 0;
         left: 0;
-        height: 98rem;
+        height: 98dvh;
         animation: screen-out 800ms ease-in forwards;
         box-shadow: inset 0 0 var(--card-gap) var(--card-gap)
           var(--color-background);
@@ -406,7 +406,7 @@
         right: 0;
         bottom: 0;
         left: 0;
-        padding: 17rem;
+        padding: 17dvh;
         background: var(--color-danger);
         font-size: 5vmin;
         text-align: center;
@@ -496,9 +496,6 @@
         card {
           margin: 0;
         }
-        card a.source {
-          bottom: 0;
-        }
       }
       @media (max-aspect-ratio: 6/7) {
         h1 span::before {
@@ -560,9 +557,6 @@
         }
         timeframe {
           margin: auto;
-        }
-        card a.source {
-          font-size: 0.05em;
         }
       }
       @media (max-aspect-ratio: 1/2) {
@@ -635,18 +629,6 @@
       }
     </style>
     <link rel="icon" type="image/png" href="./images/icons/icon.svg" />
-    <script>
-      function updateRem() {
-        setTimeout(() => {
-          document.documentElement.style.setProperty(
-            "font-size",
-            0.01 * document.documentElement.clientHeight + "px"
-          );
-        });
-      }
-      updateRem();
-      addEventListener("resize", updateRem);
-    </script>
     <script
       async
       src="https://www.googletagmanager.com/gtag/js?id=G-FL6DQC8FHB"
@@ -876,7 +858,7 @@
                         fill="currentColor"
                       />
                     </svg>
-                    <version>1.19.1</version>
+                    <version>1.20.0</version>
                   </a>
                 </li>
               </ul>

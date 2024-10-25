@@ -4,7 +4,7 @@
   "name": "Sora Quantity Monitor",
   "short_name": "Sora Quantity",
   "description": "Check circulating supply of Sora ecosystem tokens",
-  "theme_color": "#ffffff",
+  "theme_color": "#000000",
   "background_color": "#51276c",
   "display": "standalone",
   "scope": "/",
