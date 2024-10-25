@@ -12,7 +12,7 @@
     />
     <meta
       name="keywords"
-      content="Sora, circulating supply, cryptocurrency, crypto, token, coin, web3, quantity, qty, xor, val, pswap, xst, xstusd, dot, ksm, eth, dai, usdc, usdt, caps"
+      content="sora supply, sora, quantity, qty, cbdc, crypto, token, coin, xor, val, pswap, dot, ksm, eth, dai, ken, kusd"
     />
     <meta name="theme-color" content="#000000" />
     <meta property="og:image" content="./images/preview.png" />
@@ -31,13 +31,13 @@
         src: url("./fonts/Sora-SemiBold.ttf");
       }
       ::-webkit-scrollbar {
-        height: 2dvh;
+        height: 1.7rem;
         background-color: var(--color-background);
         font-size: var(--font-size);
       }
       ::-webkit-scrollbar-thumb {
         border: var(--card-border);
-        border-radius: 1dvh;
+        border-radius: 1rem;
         background-color: var(--color-primary);
       }
       ::-webkit-scrollbar-thumb:active {
@@ -70,14 +70,14 @@
         --color-warning: #e3c300;
         --color-success: #52e323;
         --color-info: #238be3;
-        --card-pixel: min(0.1166dvh, 0.2444vmin);
+        --card-pixel: min(0.1166rem, 0.2444vmin);
         --card-border: var(--color-primary) solid calc(3 * var(--card-pixel));
         --card-width: calc(360 * var(--card-pixel));
         --card-height: calc(315 * var(--card-pixel));
         --card-padding: calc(30 * var(--card-pixel));
-        --font-size: min(6dvh, 9.6vmin);
+        --font-size: min(6rem, 9.6vmin);
         --card-margin: calc(
-          (100dvh - var(--card-padding) - var(--card-height)) / 32
+          (100rem - var(--card-padding) - var(--card-height)) / 32
         );
         --card-gap: calc(var(--card-padding) + var(--card-margin));
         --header-width: calc(100vw - 2 * var(--header-padding));
@@ -88,6 +88,7 @@
         background-color: var(--color-background);
         color: var(--color-primary);
         font-size: 1vh;
+        font-size: 1dvh;
         user-select: none;
       }
       body {
@@ -99,7 +100,7 @@
         position: relative;
         display: flex;
         overflow: scroll hidden;
-        height: 100dvh;
+        height: 100rem;
         flex-direction: column;
         align-items: flex-start;
         justify-content: space-evenly;
@@ -120,9 +121,17 @@
         line-height: 1;
       }
       h1 {
+        position: relative;
         margin: 0;
         font-size: 1em;
         white-space: nowrap;
+      }
+      h1 sora {
+        position: absolute;
+        top: -1rem;
+        left: -1rem;
+        border: 1rem solid var(--color-background);
+        background-color: var(--color-background);
       }
       h1 a::before {
         content: "Sora";
@@ -320,7 +329,7 @@
       }
       @-moz-document url-prefix() {
         content {
-          padding-bottom: 2dvh;
+          padding-bottom: 2rem;
         }
       }
       card {
@@ -328,7 +337,7 @@
         display: flex;
         justify-content: center;
         margin: 0 var(--card-margin);
-        font-size: 42dvh;
+        font-size: 42rem;
       }
       card ticker {
         position: absolute;
@@ -360,7 +369,7 @@
       }
       card a.source {
         position: absolute;
-        bottom: -0.25dvh;
+        bottom: -0.25rem;
         display: none;
         color: var(--color-secondary);
         font-size: 0.048em;
@@ -393,7 +402,7 @@
         top: 0;
         right: 0;
         left: 0;
-        height: 98dvh;
+        height: 98rem;
         animation: screen-out 800ms ease-in forwards;
         box-shadow: inset 0 0 var(--card-gap) var(--card-gap)
           var(--color-background);
@@ -406,7 +415,7 @@
         right: 0;
         bottom: 0;
         left: 0;
-        padding: 17dvh;
+        padding: 17rem;
         background: var(--color-danger);
         font-size: 5vmin;
         text-align: center;
@@ -650,10 +659,17 @@
   <body>
     <app>
       <header>
-        <h1>
-          <a href="https://sora.org" target="_blank" title="[visit Sora site]">
-          </a>
-          <span title="mostly, number of coins in circulation"></span>
+        <h1 aria-description="Sora supply">
+          <supply>Supply</supply>
+          <sora>
+            <a
+              href="https://sora.org"
+              target="_blank"
+              title="[visit Sora site]"
+            >
+            </a>
+            <span title="mostly, number of coins in circulation"></span>
+          </sora>
         </h1>
         <h2>
           <mode tabindex="-1">
@@ -858,7 +874,7 @@
                         fill="currentColor"
                       />
                     </svg>
-                    <version>1.20.0</version>
+                    <version>1.21.0</version>
                   </a>
                 </li>
               </ul>

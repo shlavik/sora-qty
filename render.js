@@ -1,4 +1,4 @@
-import { createCanvas, Fonts, Image } from "jsr:@gfx/canvas@0.5.6";
+import { createCanvas, Fonts, Image } from "jsr:@gfx/canvas@0.5.8";
 
 import {
   cardHeight,

@@ -1,1 +1,1 @@
-deno run --allow-all ./grab.js
+deno run -A ./grab.js

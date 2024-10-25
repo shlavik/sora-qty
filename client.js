@@ -202,6 +202,18 @@ timeframeEl.addEventListener("click", (event) => {
   setTimeframe(event.target.id);
 });
 
+(function resetLaysAtMidnight() {
+  const midnight = new Date();
+  midnight.setHours(24, 0, 0, 0);
+  const untilMidnight = midnight - Date.now();
+  setTimeout(() => {
+    tokens[mode].forEach(resetLays);
+    setInterval(() => {
+      tokens[mode].forEach(resetLays);
+    }, 24 * 60 * 60 * 1000);
+  }, untilMidnight);
+})();
+
 function fetchTokens() {
   return fetch("./tokens.json", { cache: "reload" })
     .then((response) => response.text())
