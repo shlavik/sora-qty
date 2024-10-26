@@ -324,7 +324,9 @@ function createCards() {
   tokens[mode].forEach(createCard);
   const scroll = Number(localStorage.getItem("scroll"));
   if (scroll <= 0) return;
-  appEl.scrollLeft = (scroll * (appEl.scrollWidth - appEl.clientWidth)) / 1e8;
+  const scrollLeft = (scroll * (appEl.scrollWidth - appEl.clientWidth)) / 1e8;
+  appEl.scrollLeft = scrollLeft;
+  setTimeout(() => (appEl.scrollLeft = scrollLeft));
 }
 
 function findIndexes(data = [], x = 0) {
