@@ -273,10 +273,18 @@ export function formatValue(value, token) {
   return value >= 100 ? Math.round(value) : value;
 }
 
+export function isTooManyZeros(value) {
+  return (
+    String(value)
+      .split("")
+      .reduce((acc, el) => acc + !+el, 0) > 11
+  );
+}
+
 export function drawValue(ctx, [x, y], { token, value = 0 }) {
   value = formatValue(value, token);
   const text = addSeparator(value);
-  const size =
+  let size =
     value > 9999999999999
       ? 26
       : value > 999999999999
@@ -286,6 +294,7 @@ export function drawValue(ctx, [x, y], { token, value = 0 }) {
       : value > 9999999999
       ? 34
       : 36;
+  if (isTooManyZeros(value)) size = Math.round(size * 0.94);
   const padding = size / 3;
   const gradient = ctx.createLinearGradient(x, y - padding, x, y + padding);
   gradient.addColorStop(0, "yellow");
