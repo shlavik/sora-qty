@@ -8,6 +8,8 @@ import {
   getMousePos,
 } from "./core.js";
 
+const { abs, round, random, floor, min, max } = Math;
+
 const MODES = {
   xor: "xor",
   ken: "ken",
@@ -40,7 +42,7 @@ const screenEl = appEl.querySelector("screen");
 
 function getScroll() {
   const { clientWidth, scrollLeft, scrollWidth } = appEl;
-  return Math.round((1e8 * scrollLeft) / (scrollWidth - clientWidth));
+  return round((1e8 * scrollLeft) / (scrollWidth - clientWidth));
 }
 
 const updateLocalStorageScrollDebounced = debounce(
@@ -210,7 +212,7 @@ timeframeEl.addEventListener("click", (event) => {
     tokens[mode].forEach(resetLays);
     setInterval(() => {
       tokens[mode].forEach(resetLays);
-    }, 24 * 60 * 60 * 1000);
+    }, 24 * 60 * 60 * 1e3);
   }, untilMidnight);
 })();
 
@@ -219,16 +221,21 @@ function fetchTokens() {
     .then((response) => response.text())
     .then(JSON.parse)
     .catch(() => {
-      setTimeout(() => (window.location = location), 1000);
+      setTimeout(() => (window.location = location), 1e3);
       return [];
     });
 }
 
-fetchTokens().then((value) => {
-  tokens = value;
+fetchTokens().then((raw) => {
+  tokens = Object.fromEntries(
+    Object.entries(raw).map(([k, v]) => [
+      k,
+      v.map((t) => (Array.isArray(t) ? t[round(random())] : t)),
+    ])
+  );
   createCards();
   checkTimestamp();
-  setInterval(() => checkTimestamp(), 10000);
+  setInterval(() => checkTimestamp(), 10e3);
 });
 
 function fetchData(token, reload) {
@@ -253,7 +260,7 @@ function checkTimestamp() {
     .catch(() => {})
     .then((timestamp) => {
       updateEl.innerText = timestamp
-        ? Math.round((Date.now() - timestamp) / 60000) + "m ago"
+        ? round((Date.now() - timestamp) / 60e3) + "m ago"
         : "N/A";
       if (!timestamp || timestamp === checkTimestamp.timestamp) return;
       if (checkTimestamp.timestamp) {
@@ -335,7 +342,7 @@ function findIndexes(data = [], x = 0) {
   let low = 0;
   let high = data.length - 1;
   while (low <= high) {
-    const mid = Math.floor((low + high) / 2);
+    const mid = floor((low + high) / 2);
     if (data[mid][0] < x) {
       low = mid + 1;
     } else if (data[mid][0] > x) {
@@ -344,12 +351,12 @@ function findIndexes(data = [], x = 0) {
       return [mid, mid];
     }
   }
-  return [Math.max(0, low - 1), Math.min(data.length - 1, low)];
+  return [max(0, low - 1), min(data.length - 1, low)];
 }
 
 function findClosestIndex(data, x, leftIndex, rightIndex) {
   return leftIndex === rightIndex ||
-    Math.abs(data[leftIndex][0] - x) < Math.abs(data[rightIndex][0] - x)
+    abs(data[leftIndex][0] - x) < abs(data[rightIndex][0] - x)
     ? leftIndex
     : rightIndex;
 }
@@ -368,9 +375,8 @@ function findClosestPeak(data, startIndex, startTimestamp, timeRange) {
   let peakValue = data[startIndex][1];
   for (let i = startIndex; i < data.length && data[i][0] <= endTime; i++) {
     if (
-      Math.abs(data[i][1] - peakValue) > 0 &&
-      (peakIndex === null ||
-        Math.abs(data[i][1]) > Math.abs(data[peakIndex][1]))
+      abs(data[i][1] - peakValue) > 0 &&
+      (peakIndex === null || abs(data[i][1]) > abs(data[peakIndex][1]))
     ) {
       peakIndex = i;
       peakValue = data[i][1];
@@ -378,9 +384,8 @@ function findClosestPeak(data, startIndex, startTimestamp, timeRange) {
   }
   for (let i = startIndex; i >= 0 && data[i][0] >= startTime; i--) {
     if (
-      Math.abs(data[i][1] - peakValue) > 0 &&
-      (peakIndex === null ||
-        Math.abs(data[i][1]) > Math.abs(data[peakIndex][1]))
+      abs(data[i][1] - peakValue) > 0 &&
+      (peakIndex === null || abs(data[i][1]) > abs(data[peakIndex][1]))
     ) {
       peakIndex = i;
       peakValue = data[i][1];

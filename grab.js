@@ -8,7 +8,7 @@ import {
 
 import tokensObj from "./tokens.json" with { type: "json" };
 
-const tokens = Object.values(tokensObj).flatMap(el => el);
+const tokens = Object.values(tokensObj).flat(Infinity);
 const baseUrl = "https://mof.sora.org/qty/";
 
 grab().then((grabbed) => {
