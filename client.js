@@ -230,7 +230,7 @@ fetchTokens().then((raw) => {
   tokens = Object.fromEntries(
     Object.entries(raw).map(([k, v]) => [
       k,
-      v.map((t) => (Array.isArray(t) ? t[round(random())] : t)),
+      v.map((t) => fixTon(Array.isArray(t) ? t[round(random())] : t)),
     ])
   );
   createCards();
@@ -238,9 +238,17 @@ fetchTokens().then((raw) => {
   setInterval(() => checkTimestamp(), 10e3);
 });
 
+function fixTon(token) {
+  return token === "toncoin" ? "ton" : token;
+}
+
+function fixToncoin(token) {
+  return token === "ton" ? "toncoin" : token;
+}
+
 function fetchData(token, reload) {
   return fetch(
-    "./data/prepared/" + token + ".json",
+    "./data/prepared/" + fixToncoin(token) + ".json",
     reload
       ? {
           cache: "reload",
@@ -298,7 +306,7 @@ function getLinkEl(token) {
   if (getLinkEl.cache[token]) return getLinkEl.cache[token];
   const linkEl = document.createElement("a");
   linkEl.className = "source";
-  linkEl.href = "https://mof.sora.org/qty/" + token;
+  linkEl.href = "https://mof.sora.org/qty/" + fixToncoin(token);
   linkEl.target = "_blank";
   linkEl.title = "[check source]";
   linkEl.innerText = "LOADING...";
