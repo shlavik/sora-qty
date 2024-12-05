@@ -310,8 +310,9 @@ function getCardEl(token) {
   if (!getCardEl.cache) getCardEl.cache = {};
   if (getCardEl.cache[token]) return getCardEl.cache[token];
   const tickerEl = document.createElement("ticker");
-  tickerEl.className = "length-" + token.length;
-  tickerEl.innerText = token.toUpperCase();
+  const tkn = token === "toncoin" ? "ton" : token;
+  tickerEl.className = "length-" + tkn.length;
+  tickerEl.innerText = tkn.toUpperCase();
   const cardEl = document.createElement("card");
   cardEl.tabIndex = -1;
   cardEl.appendChild(getCanvasEl(token));
@@ -466,10 +467,11 @@ function createUpdateOverlay(
 async function drawUnderlay(token) {
   const canvas = getCanvasEl(token);
   const context = canvas.getContext("2d", { willReadFrequently: true });
+  const tkn = token === "toncoin" ? "ton" : token;
   const { cutted, points } = drawCard(context, {
-    token,
+    token: tkn,
     data: dataset[token],
-    icon: getIconEl(token),
+    icon: getIconEl(tkn),
     timeframe,
     crossVisible: false,
     valueVisible: false,
@@ -523,6 +525,7 @@ function drawOverlay({
   cross = [],
   timestamp = 0,
 }) {
+  token === "toncoin" ? "ton" : token;
   if (value >= 0) drawValue(context, [180, 195], { token, value });
   drawCross(context, cross);
   if (timestamp) updateLink(getLinkEl(token), timestamp);
