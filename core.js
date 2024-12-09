@@ -285,7 +285,15 @@ export function drawValue(ctx, [x, y], { token, value = 0 }) {
   value = formatValue(value, token);
   const text = addSeparator(value);
   let size =
-    value > 9999999999999
+    value > 99999999999999999
+      ? 22
+      : value > 9999999999999999
+      ? 23
+      : value > 999999999999999
+      ? 24
+      : value > 99999999999999
+      ? 25
+      : value > 9999999999999
       ? 26
       : value > 999999999999
       ? 29
@@ -314,7 +322,6 @@ export function addSeparator(text) {
     maximumFractionDigits: 2,
   }).format(text);
 }
-
 export function drawCross(ctx, [x, y]) {
   ctx.save();
   ctx.lineCap = "round";
