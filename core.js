@@ -316,12 +316,17 @@ export function drawValue(ctx, [x, y], { token, value = 0 }) {
   });
 }
 
-export function addSeparator(text) {
-  return new Intl.NumberFormat("en-US", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(text);
+export function addSeparator(value) {
+  const moreBillion = value >= 1000000000;
+  return (
+    new Intl.NumberFormat("en-US", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: moreBillion ? 4 : 2,
+    }).format(moreBillion ? value / 1000000000 : value) +
+    (moreBillion ? "B" : "")
+  );
 }
+
 export function drawCross(ctx, [x, y]) {
   ctx.save();
   ctx.lineCap = "round";
